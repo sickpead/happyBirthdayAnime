@@ -1,0 +1,72 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--space-lg);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--color-overlay);
+  cursor: default;
+}
+
+.dialog {
+  position: relative;
+  width: 100%;
+  max-width: var(--modal-max-width);
+  max-height: 100%;
+  overflow: auto;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  color: var(--color-surface-text);
+}
+
+/* Контейнер получает фокус только программно (tabIndex=-1), рамка фокуса ему не нужна. */
+.dialog:focus {
+  outline: none;
+}
+
+/* Светлая карточка: индикатор фокуса другого цвета, чтобы сохранить контраст. */
+.dialog :focus-visible {
+  outline-color: var(--color-focus-ring-on-surface);
+}
+
+.closeButton {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  display: grid;
+  place-items: center;
+  width: var(--modal-close-size);
+  height: var(--modal-close-size);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--color-surface-text-muted);
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-interaction) ease,
+    color var(--duration-interaction) ease;
+}
+
+.closeButton:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-surface-text);
+}
+
+/* Отступ справа, чтобы содержимое не заходило под крестик. */
+.content {
+  padding-right: var(--modal-close-size);
+}

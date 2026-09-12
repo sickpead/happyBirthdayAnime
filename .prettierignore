@@ -1,0 +1,7 @@
+# Артефакты сборки и зависимости
+dist
+coverage
+node_modules
+
+# Lock-файл генерируется npm — форматировать его не нужно
+package-lock.json

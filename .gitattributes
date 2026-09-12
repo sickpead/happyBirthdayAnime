@@ -1,0 +1,21 @@
+# Единые LF-переводы строк в репозитории и рабочей копии на любой ОС
+# (совпадает с "endOfLine": "lf" в .prettierrc).
+* text=auto eol=lf
+
+# Бинарные ассеты — без нормализации и текстовых диффов.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.mp3 binary
+*.ogg binary
+*.wav binary
+*.m4a binary
+*.mp4 binary
+*.webm binary
+*.glb binary
+*.woff binary
+*.woff2 binary

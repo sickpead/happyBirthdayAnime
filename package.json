@@ -1,0 +1,48 @@
+{
+  "name": "happy-birthday-anime",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Персональный интерактивный сайт-поздравление: последовательность сцен Intro → Cake → Desk на React, Three.js, GSAP и Howler.",
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
+    "gsap": "^3.15.0",
+    "howler": "^2.2.4",
+    "react": "~19.2.8",
+    "react-dom": "~19.2.8",
+    "three": "^0.186.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/howler": "^2.2.13",
+    "@types/node": "^24.13.4",
+    "@types/react": "~19.2.18",
+    "@types/react-dom": "~19.2.7",
+    "@types/three": "^0.186.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.6",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.70.0",
+    "vite": "^8.3.0"
+  }
+}

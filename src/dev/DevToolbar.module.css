@@ -1,0 +1,53 @@
+.toolbar {
+  position: fixed;
+  bottom: var(--space-md);
+  left: 50%;
+  z-index: var(--z-hud);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-panel);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.badge {
+  color: var(--color-accent);
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-bold);
+}
+
+.group {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.group + .group {
+  padding-left: var(--space-md);
+  border-left: 1px solid var(--color-border-subtle);
+}
+
+.button {
+  padding: var(--space-xs) var(--space-md);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-interaction) ease,
+    background-color var(--duration-interaction) ease;
+}
+
+.button:hover {
+  border-color: var(--color-text-muted);
+}
+
+.button[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
+}

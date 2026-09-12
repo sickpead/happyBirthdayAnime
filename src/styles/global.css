@@ -1,0 +1,39 @@
+/*
+ * Глобальные стили: сброс и базовая типографика.
+ * Значения токенов (--color-*, --space-* и т.д.) объявляются из TypeScript:
+ * см. src/constants/ и src/styles/cssVariables.ts.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  color: inherit;
+  font: inherit;
+}
+
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
