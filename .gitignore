@@ -24,6 +24,9 @@ pnpm-debug.log*
 # Tool caches
 .eslintcache
 
+# Local agent / editor files
+.claude
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

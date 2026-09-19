@@ -1,5 +1,7 @@
-// Глобальные стили импортируются первыми, чтобы CSS-модули компонентов шли после них в каскаде.
+// Порядок важен: цветовые токены → глобальные стили и утилиты → CSS-модули компонентов (через App).
+import './styles/tokens.css';
 import './styles/global.css';
+import './styles/buttons.css';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

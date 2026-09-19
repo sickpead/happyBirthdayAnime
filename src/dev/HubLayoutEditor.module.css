@@ -1,0 +1,84 @@
+/* Панель редактора раскладки — над dev-панелью сцен, чтобы они не перекрывались. */
+.panel {
+  position: fixed;
+  bottom: calc(var(--space-md) * 4);
+  left: 50%;
+  z-index: var(--z-hud);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  width: max-content;
+  max-width: 90vw;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-stone-grey);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-panel);
+  box-shadow: var(--shadow-soft);
+  color: var(--color-ink);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.badge {
+  color: var(--color-accent-terracotta-deep);
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-bold);
+}
+
+.hint {
+  color: var(--color-ink-soft);
+}
+
+.value,
+.status {
+  font-family: var(--font-family-mono);
+}
+
+.status {
+  color: var(--color-accent-terracotta-deep);
+}
+
+/* Готовые строки конфигов: во встроенных браузерах буфер недоступен, поэтому их видно и так. */
+.output {
+  flex-basis: 100%;
+  min-width: 32rem;
+  max-width: 100%;
+  padding: var(--space-sm);
+  border: 1px solid var(--color-stone-grey);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-cream);
+  color: var(--color-ink);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  white-space: pre;
+  resize: vertical;
+}
+
+/* Тот же контурный вариант кнопок, что и у dev-панели сцен. */
+.button {
+  padding: var(--space-xs) var(--space-md);
+  border: 1px solid var(--color-ink-soft);
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-interaction) ease,
+    background-color var(--duration-interaction) ease,
+    color var(--duration-interaction) ease;
+}
+
+.button:hover {
+  border-color: var(--color-accent-gold);
+  background-color: var(--color-accent-gold);
+  color: var(--color-ink);
+}
+
+.button:active {
+  border-color: var(--color-accent-terracotta-deep);
+  background-color: var(--color-accent-terracotta-deep);
+  color: var(--color-bg-cream);
+}

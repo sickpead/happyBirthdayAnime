@@ -1,0 +1,27 @@
+.scene {
+  composes: scene-ambient-light from global;
+  /* Кадры стадий считают размеры от сцены (cqw / cqh). */
+  container-type: size;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Заголовок сцены — для скринридеров; визуально сцену представляют картинки. */
+.title {
+  composes: visually-hidden from global;
+}
+
+/* Ролик-переход лежит над кадром уходящей стадии, но под затемнением и облаками. */
+.transitionVideo {
+  z-index: 1;
+}
+
+/*
+ * Затемнение (и облака, если стадия переходит через них): над кадрами и роликом, но внутри
+ * сцены — иконка проигрывателя остаётся поверх.
+ */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}

@@ -1,0 +1,342 @@
+/* Слой предметов поверх стола: проценты — от кадра стадии, то есть от картинки стола. */
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/*
+ * Декор: картинки для атмосферы. Координаты в конфиге — центр предмета, поэтому картинка
+ * сдвигается на половину себя; наклон задаётся инлайн (rotate). Клики и наведение проходят
+ * насквозь — реагируют только кнопки предметов.
+ */
+.decor {
+  position: absolute;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  translate: -50% -50%;
+  filter: var(--desk-object-shadow);
+}
+
+/*
+ * Предмет — кнопка без собственного фона: видна только картинка с мягкой тенью.
+ * Основание остаётся на месте, предмет «приподнимается» от него.
+ * --rest-rotation-deg — постоянный наклон предмета из конфига (restRotationDeg, по умолчанию 0).
+ */
+.object {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  transform-origin: 50% 100%;
+  transform: rotate(var(--rest-rotation-deg, 0deg));
+  filter: var(--desk-object-shadow);
+}
+
+/*
+ * Тень ниже и тёплое свечение — и при prefers-reduced-motion. Приподнятый предмет встаёт
+ * поверх соседей, даже если по порядку в конфиге лежит под ними.
+ */
+.object:hover,
+.object:focus-visible {
+  z-index: 1;
+  filter: var(--desk-object-shadow-raised);
+}
+
+/*
+ * Предмет уже на картинке стола: кнопка только ловит клик. Без filter и без подъёма —
+ * двигаться нечему, а drop-shadow пустой кнопки дал бы прямоугольное пятно.
+ */
+.object[data-painted-in-backdrop='true'] {
+  filter: none;
+}
+
+.object[data-painted-in-backdrop='true']:hover,
+.object[data-painted-in-backdrop='true']:focus-visible {
+  filter: none;
+}
+
+/*
+ * Лист-черновик: та же кнопка, что и у предмета, но координаты в конфиге — центр листа,
+ * поэтому он сдвигается на половину себя. Упавший в траву лист отбрасывает более мягкую
+ * и зеленоватую тень, чем лежащий на столешнице.
+ */
+.sheet {
+  translate: -50% -50%;
+}
+
+.sheet[data-surface='grass'] {
+  /* Переопределяем сам токен тени, чтобы подъём при наведении остался общим. */
+  --desk-object-shadow: var(--desk-sheet-shadow-grass);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+}
+
+/*
+ * crossfade-open: закрытая картинка в потоке задаёт размер, открытая лежит поверх на том же
+ * холсте. При наведении и фокусе закрытая перетекает в открытую — и при
+ * prefers-reduced-motion, только без анимации: это смена состояния, а не движение.
+ */
+.crossfade {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.openImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.object[data-hover-style='crossfade-open']:hover .openImage,
+.object[data-hover-style='crossfade-open']:focus-visible .openImage,
+.object[data-hover-style='crossfade-open']:hover .hoverReveal,
+.object[data-hover-style='crossfade-open']:focus-visible .hoverReveal {
+  opacity: 1;
+}
+
+/*
+ * Открытая картинка поверх предмета, уже нарисованного на столе. Больше хитбокса
+ * (открытая книга, конверт с клапаном) и не ловит клики — их ловит кнопка.
+ */
+.hoverReveal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--reveal-width);
+  height: var(--reveal-height);
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  translate: calc(-50% + var(--reveal-offset-x, 0%)) calc(-50% + var(--reveal-offset-y, 0%));
+  scale: 0.94;
+}
+
+/*
+ * Огонь на торте стола: рамка — видимое пламя, картинка сдвинута как у BirthdayCake.
+ * В покое скрыт; при наведении проявляется и мерцает.
+ */
+.deskFlame {
+  position: absolute;
+  overflow: hidden;
+  aspect-ratio: var(--flame-aspect);
+  opacity: 0;
+  pointer-events: none;
+  translate: -50% -92%;
+  transform-origin: 50% 100%;
+}
+
+.deskFlameImage {
+  position: absolute;
+  max-width: none;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-accent-gold) 80%, transparent));
+}
+
+.object[data-hover-style='light-candles']:hover .deskFlame,
+.object[data-hover-style='light-candles']:focus-visible .deskFlame {
+  opacity: 1;
+}
+
+/* Закрытая картинка уходит, только если открытая есть, — иначе предмет остаётся закрытым. */
+.object[data-hover-style='crossfade-open']:hover .crossfade[data-has-open='true'] .image,
+.object[data-hover-style='crossfade-open']:focus-visible .crossfade[data-has-open='true'] .image {
+  opacity: 0;
+}
+
+/*
+ * Составной предмет: базовая картинка (корпус) задаёт размер, внутренние слои растянуты
+ * поверх неё и сдвигаются, масштабируются и поворачиваются через CSS-переменные из конфига
+ * (--layer-*, --tonearm-*, задаются инлайн).
+ */
+.composed {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.vinylLayer,
+.tonearmLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Пластинка лежит на платтере и не двигается. */
+.vinylLayer {
+  transform: translate(var(--layer-offset-x), var(--layer-offset-y)) scale(var(--layer-scale));
+}
+
+/* Тонарм поворачивается вокруг своей оси; в покое — на держателе. */
+.tonearmLayer {
+  transform-origin: var(--tonearm-pivot);
+  transform: translate(var(--layer-offset-x), var(--layer-offset-y)) scale(var(--layer-scale))
+    rotate(var(--tonearm-rest-deg));
+}
+
+/*
+ * tonearm-swing: сам предмет не приподнимается — при наведении и фокусе тонарм подводится
+ * к пластинке (свечение предмета — общее правило выше). Смена угла остаётся и при
+ * prefers-reduced-motion, только без анимации: это разовая смена положения, не тряска.
+ */
+.object[data-hover-style='tonearm-swing']:hover .tonearmLayer,
+.object[data-hover-style='tonearm-swing']:focus-visible .tonearmLayer {
+  transform: translate(var(--layer-offset-x), var(--layer-offset-y)) scale(var(--layer-scale))
+    rotate(var(--tonearm-hover-deg));
+}
+
+/* Движение — только если пользователь не просил его уменьшить. */
+@media (prefers-reduced-motion: no-preference) {
+  .object {
+    transition:
+      transform var(--duration-desk-object-hover) ease-out,
+      filter var(--duration-desk-object-hover) ease-out;
+  }
+
+  .tonearmLayer {
+    transition: transform var(--duration-desk-tonearm-swing) ease-out;
+  }
+
+  .crossfade .image,
+  .openImage,
+  .hoverReveal,
+  .deskFlame {
+    transition: opacity var(--duration-desk-object-hover) ease-out;
+  }
+
+  .hoverReveal {
+    transition:
+      opacity var(--duration-desk-object-hover) ease-out,
+      scale var(--duration-desk-object-hover) ease-out;
+  }
+
+  .object[data-hover-style='crossfade-open']:hover .hoverReveal,
+  .object[data-hover-style='crossfade-open']:focus-visible .hoverReveal {
+    scale: 1;
+  }
+
+  .object[data-hover-style='light-candles']:hover .deskFlame,
+  .object[data-hover-style='light-candles']:focus-visible .deskFlame {
+    animation: desk-flame-flicker var(--duration-desk-flame-flicker) ease-in-out infinite;
+    animation-delay: var(--flame-delay, 0ms);
+  }
+
+  /* Письмо: приподняли и открыли — под тем же наклоном, что и в покое, не выпрямляя. */
+  .object[data-hover-style='crossfade-open']:hover,
+  .object[data-hover-style='crossfade-open']:focus-visible {
+    transform: translateY(-5%) scale(1.05) rotate(var(--rest-rotation-deg, 0deg));
+  }
+
+  /* Торт: приподняли и чуть наклонили. */
+  .object[data-hover-style='lift-tilt']:hover,
+  .object[data-hover-style='lift-tilt']:focus-visible {
+    transform: translateY(-6%) scale(1.06) rotate(-2deg);
+  }
+
+  /* Книга: приподняли и повернули. */
+  .object[data-hover-style='lift-rotate']:hover,
+  .object[data-hover-style='lift-rotate']:focus-visible {
+    transform: translateY(-7%) scale(1.07) rotate(4deg);
+  }
+
+  /* Просто мягкий подъём, без поворота. */
+  .object[data-hover-style='lift-only']:hover,
+  .object[data-hover-style='lift-only']:focus-visible {
+    transform: translateY(-5%) scale(1.05);
+  }
+
+  /*
+   * Черновики: бумага «шелестит» — приподнимается и покачивается, пока курсор на ней.
+   * Наклон листа из конфига сохраняется, иначе лист выпрямлялся бы под курсором.
+   */
+  .object[data-hover-style='lift-wiggle']:hover,
+  .object[data-hover-style='lift-wiggle']:focus-visible {
+    transform: translateY(-6%) scale(1.05) rotate(var(--rest-rotation-deg, 0deg));
+    animation: wiggle var(--duration-desk-object-wiggle) infinite;
+  }
+
+  .object[data-painted-in-backdrop='true']:hover,
+  .object[data-painted-in-backdrop='true']:focus-visible {
+    transform: rotate(var(--rest-rotation-deg, 0deg));
+    animation: none;
+  }
+}
+
+/*
+ * Покачивание ±2° — отдельным свойством rotate, а не transform: подъём остаётся на
+ * transform и, как у остальных предметов, плавно появляется и уходит через transition.
+ * Как маятник: быстрее всего через середину, с замедлением у крайних точек.
+ */
+@keyframes desk-flame-flicker {
+  0%,
+  100% {
+    scale: 1 1;
+    rotate: 0deg;
+    opacity: 1;
+  }
+
+  25% {
+    scale: 0.9 1.1;
+    rotate: -2deg;
+    opacity: 0.94;
+  }
+
+  50% {
+    scale: 1.08 0.96;
+    rotate: 3deg;
+    opacity: 1;
+  }
+
+  75% {
+    scale: 0.94 1.06;
+    rotate: -3deg;
+    opacity: 0.96;
+  }
+}
+
+@keyframes wiggle {
+  0% {
+    rotate: 0deg;
+    animation-timing-function: ease-out;
+  }
+
+  25% {
+    rotate: -2deg;
+    animation-timing-function: ease-in;
+  }
+
+  50% {
+    rotate: 0deg;
+    animation-timing-function: ease-out;
+  }
+
+  75% {
+    rotate: 2deg;
+    animation-timing-function: ease-in;
+  }
+
+  100% {
+    rotate: 0deg;
+  }
+}

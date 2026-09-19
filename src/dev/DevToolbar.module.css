@@ -7,16 +7,18 @@
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--color-border-subtle);
+  border: 1px solid var(--color-stone-grey);
   border-radius: var(--radius-pill);
   background-color: var(--color-panel);
+  box-shadow: var(--shadow-soft);
+  color: var(--color-ink);
   font-size: var(--font-size-sm);
   white-space: nowrap;
   transform: translateX(-50%);
 }
 
 .badge {
-  color: var(--color-accent);
+  color: var(--color-accent-terracotta-deep);
   font-family: var(--font-family-mono);
   font-weight: var(--font-weight-bold);
 }
@@ -28,26 +30,36 @@
 
 .group + .group {
   padding-left: var(--space-md);
-  border-left: 1px solid var(--color-border-subtle);
+  border-left: 1px solid var(--color-stone-grey);
 }
 
+/*
+ * Схема акцентов из styles/buttons.css, но в контурном варианте: мелкий текст
+ * кремовым по терракоте не проходит по контрасту, поэтому базовое состояние
+ * контурное, а hover и pressed — по общей схеме (золото / глубокая терракота).
+ */
 .button {
   padding: var(--space-xs) var(--space-md);
-  border: 1px solid var(--color-border-subtle);
+  border: 1px solid var(--color-ink-soft);
   border-radius: var(--radius-pill);
   background-color: transparent;
+  color: var(--color-ink);
   cursor: pointer;
   transition:
     border-color var(--duration-interaction) ease,
-    background-color var(--duration-interaction) ease;
+    background-color var(--duration-interaction) ease,
+    color var(--duration-interaction) ease;
 }
 
 .button:hover {
-  border-color: var(--color-text-muted);
+  border-color: var(--color-accent-gold);
+  background-color: var(--color-accent-gold);
+  color: var(--color-ink);
 }
 
+.button:active,
 .button[aria-pressed='true'] {
-  border-color: var(--color-accent);
-  background-color: var(--color-accent);
-  color: var(--color-accent-contrast);
+  border-color: var(--color-accent-terracotta-deep);
+  background-color: var(--color-accent-terracotta-deep);
+  color: var(--color-bg-cream);
 }

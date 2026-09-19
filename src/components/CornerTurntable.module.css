@@ -1,48 +1,34 @@
-.turntable {
+/*
+ * Холст картинок шире самой деки (прозрачные поля), поэтому его размер и отступы
+ * вычислены из границ деки (см. cssVariables.ts): дека стоит ровно в углу, а прозрачные
+ * поля могут заходить за край экрана.
+ */
+.corner {
   position: fixed;
-  top: var(--turntable-offset);
-  right: var(--turntable-offset);
+  top: var(--corner-turntable-top);
+  right: var(--corner-turntable-right);
   z-index: var(--z-turntable);
-  width: var(--turntable-size);
-  height: var(--turntable-size);
+  width: var(--corner-turntable-width);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  /* visibility переключается после окончания фейда: скрытый элемент не должен перехватывать клики. */
+  /* visibility переключается после окончания фейда. */
   transition:
     opacity var(--duration-turntable-fade) ease,
     visibility 0s linear var(--duration-turntable-fade);
 }
 
-.turntable[data-visible='true'] {
+.corner[data-visible='true'] {
   opacity: 1;
   visibility: visible;
-  pointer-events: auto;
   transition:
     opacity var(--duration-turntable-fade) ease,
     visibility 0s linear 0s;
 }
 
-.record {
-  position: absolute;
-  inset: 0;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: 50%;
-  background-color: var(--color-vinyl);
-  box-shadow: var(--shadow-card);
-}
-
-/* Яблоко пластинки занимает центральную треть диска. */
-.label {
-  position: absolute;
-  inset: calc(100% / 3);
-  border-radius: 50%;
-  background-color: var(--color-vinyl-label);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .turntable,
-  .turntable[data-visible='true'] {
+  .corner,
+  .corner[data-visible='true'] {
     transition: none;
   }
 }

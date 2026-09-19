@@ -1,7 +1,7 @@
 /*
- * Глобальные стили: сброс и базовая типографика.
- * Значения токенов (--color-*, --space-* и т.д.) объявляются из TypeScript:
- * см. src/constants/ и src/styles/cssVariables.ts.
+ * Глобальные стили: сброс, базовая типографика и утилитарные классы.
+ * Цвета — из src/styles/tokens.css (подключается раньше этого файла);
+ * размеры, тайминги и слои — из src/constants через src/styles/cssVariables.ts.
  */
 
 *,
@@ -19,8 +19,14 @@ body,
 body {
   margin: 0;
   overflow: hidden;
-  background-color: var(--color-background);
-  color: var(--color-text);
+  /* Кремовый фон всех сцен: светлее у источника света (слева сверху), глубже к противоположному углу. */
+  background-color: var(--color-bg-cream);
+  background-image: linear-gradient(
+    to bottom right,
+    var(--color-bg-cream),
+    var(--color-bg-cream-deep)
+  );
+  color: var(--color-ink);
   font-family: var(--font-family-base);
   font-size: var(--font-size-md);
   line-height: var(--line-height-base);
@@ -36,4 +42,69 @@ button {
 :focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-ring-offset);
+}
+
+/* ── Утилиты ─────────────────────────────────────────────────────────── */
+
+/* Скрыть визуально, оставив доступным для скринридеров (например, заголовок сцены). */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * Кадр по принципу object-fit: cover — элемент с пропорциями своего содержимого
+ * (--frame-aspect-ratio задаёт владелец), растянутый так, чтобы закрыть сцену целиком,
+ * и отцентрованный. Проценты внутри такого кадра — проценты самой картинки или ролика.
+ * cqw / cqh — размеры сцены: у её корня должен быть container-type: size.
+ * В CSS-модуле: `composes: cover-frame from global;`.
+ */
+.cover-frame {
+  --frame-width: max(100cqw, 100cqh * var(--frame-aspect-ratio));
+  --frame-height: max(100cqh, 100cqw / var(--frame-aspect-ratio));
+
+  position: absolute;
+  top: calc((100cqh - var(--frame-height)) / 2);
+  left: calc((100cqw - var(--frame-width)) / 2);
+  width: var(--frame-width);
+  height: var(--frame-height);
+}
+
+/*
+ * Декоративный слой тёплого света на фоне сцены: мягкое золотистое свечение из угла
+ * --ambient-light-origin, затухающее к противоположным краям в bg-cream-deep / stone-grey.
+ * Добавляется корню каждой сцены — в CSS-модуле: `composes: scene-ambient-light from global;`.
+ * Свет рисуется псевдоэлементом под контентом (z-index: -1 внутри изолированного контекста
+ * наложения), не перехватывает события и не влияет на читаемость текста и кнопок.
+ */
+.scene-ambient-light {
+  position: relative;
+  isolation: isolate;
+}
+
+.scene-ambient-light::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at var(--ambient-light-origin),
+      var(--ambient-light-glow) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse farthest-corner at var(--ambient-light-origin),
+      transparent 45%,
+      var(--ambient-light-falloff) 80%,
+      var(--ambient-light-edge) 100%
+    );
 }

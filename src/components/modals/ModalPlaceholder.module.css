@@ -6,5 +6,5 @@
 
 .text {
   margin: 0;
-  color: var(--color-surface-text-muted);
+  color: var(--color-ink-soft);
 }

@@ -1,0 +1,61 @@
+/*
+ * Единая схема интерактивных акцентов (цвета — из tokens.css):
+ * терракота — основной цвет, золото — hover, глубокая терракота — active / pressed.
+ *
+ * Глобальные утилиты, которые CSS-модули подключают через
+ * `composes: accent-button from global;` — так схема описана один раз,
+ * а в разметке остаётся один класс модуля.
+ */
+
+/* Основная кнопка («Далее», «Задуть свечу», навигация комикса и т.п.). */
+.accent-button {
+  padding: var(--space-md) var(--space-xl);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent-terracotta);
+  color: var(--color-bg-cream);
+  font-size: var(--font-size-lg);
+  /* Кремовый на терракоте ≈ 3.4:1 — по WCAG это AA только для крупного или жирного текста. */
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-interaction) ease,
+    color var(--duration-interaction) ease;
+}
+
+.accent-button:hover {
+  background-color: var(--color-accent-gold);
+  color: var(--color-ink);
+}
+
+.accent-button:active,
+.accent-button[aria-pressed='true'] {
+  background-color: var(--color-accent-terracotta-deep);
+  color: var(--color-bg-cream);
+}
+
+/* Круглая кнопка-иконка (крестик модалки и т.п.): терракотовый значок без фона. */
+.accent-icon-button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: transparent;
+  color: var(--color-accent-terracotta);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-interaction) ease,
+    color var(--duration-interaction) ease;
+}
+
+.accent-icon-button:hover {
+  background-color: var(--color-accent-gold);
+  color: var(--color-ink);
+}
+
+.accent-icon-button:active,
+.accent-icon-button[aria-pressed='true'] {
+  background-color: var(--color-accent-terracotta-deep);
+  color: var(--color-bg-cream);
+}

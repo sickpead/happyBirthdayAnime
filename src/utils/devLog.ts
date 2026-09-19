@@ -12,3 +12,17 @@ export function devLog(scope: string, ...details: readonly unknown[]): void {
   }
   console.info(`[${scope}]`, ...details);
 }
+
+/**
+ * Предупреждение, которое существует только в dev-сборке (например, «файл звука не найден»).
+ * В production молчит: сцена должна продолжать работу без лишнего шума в консоли.
+ *
+ * @param scope - Подсистема-источник сообщения, например `'audio'`.
+ * @param details - Произвольные данные для вывода.
+ */
+export function devWarn(scope: string, ...details: readonly unknown[]): void {
+  if (!import.meta.env.DEV) {
+    return;
+  }
+  console.warn(`[${scope}]`, ...details);
+}

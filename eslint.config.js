@@ -18,6 +18,9 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+const COLOR_LITERAL_MESSAGE =
+  'Цвета берутся только из src/styles/tokens.css: var(--color-…) в CSS, readCssVariable() в TS/Three.js.';
+
 export default defineConfig([
   globalIgnores(['dist', 'coverage']),
 
@@ -51,6 +54,18 @@ export default defineConfig([
       eqeqeq: ['error', 'always'],
       // console.log запрещён везде; диагностика — только через src/utils/devLog.ts (DEV-only).
       'no-console': ['error', { allow: ['warn', 'error'] }],
+      // Хардкод цветов (hex / rgb / hsl) в TS/TSX запрещён — единый источник цвета tokens.css.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Literal[value=/^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/]',
+          message: COLOR_LITERAL_MESSAGE,
+        },
+        {
+          selector: 'Literal[value=/^(?:rgba?|hsla?)\\(/]',
+          message: COLOR_LITERAL_MESSAGE,
+        },
+      ],
     },
   },
 

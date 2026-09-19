@@ -1,0 +1,36 @@
+.curtain {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Небо под облаками: единственное место палитры, где допустим голубой (см. tokens.css). */
+.sky {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-sky-backdrop);
+  pointer-events: none;
+}
+
+.group {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cloud {
+  position: absolute;
+}
+
+/* Бело-голубая база облака с тёплым золотистым свечением по краям (закатный свет). */
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 var(--space-xl) var(--color-cloud-glow));
+  user-select: none;
+}
+
+.image[data-flipped='true'] {
+  transform: scaleX(-1);
+}

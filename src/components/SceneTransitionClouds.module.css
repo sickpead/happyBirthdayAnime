@@ -1,0 +1,6 @@
+/* Общий переход — на весь экран поверх сцен, но под иконкой проигрывателя. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-scene-transition);
+}

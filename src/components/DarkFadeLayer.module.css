@@ -1,0 +1,9 @@
+/*
+ * Затемнение: положение (absolute на всю сцену и т.п.) задаёт владелец. До перехода слой
+ * прозрачен и скрыт; непрозрачность и видимость ведёт GSAP.
+ */
+.layer {
+  background-color: var(--color-overlay-dark);
+  opacity: 0;
+  visibility: hidden;
+}

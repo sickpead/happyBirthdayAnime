@@ -13,7 +13,7 @@
   margin: 0;
   padding: 0;
   border: 0;
-  background-color: var(--color-overlay);
+  background-color: var(--color-overlay-dark);
   cursor: default;
 }
 
@@ -25,9 +25,9 @@
   overflow: auto;
   padding: var(--space-xl);
   border-radius: var(--radius-lg);
-  background-color: var(--color-surface);
+  background-color: var(--color-bg-cream);
   box-shadow: var(--shadow-card);
-  color: var(--color-surface-text);
+  color: var(--color-ink);
 }
 
 /* Контейнер получает фокус только программно (tabIndex=-1), рамка фокуса ему не нужна. */
@@ -35,35 +35,15 @@
   outline: none;
 }
 
-/* Светлая карточка: индикатор фокуса другого цвета, чтобы сохранить контраст. */
-.dialog :focus-visible {
-  outline-color: var(--color-focus-ring-on-surface);
-}
-
 .closeButton {
+  composes: accent-icon-button from global;
   position: absolute;
   top: var(--space-sm);
   right: var(--space-sm);
-  display: grid;
-  place-items: center;
   width: var(--modal-close-size);
   height: var(--modal-close-size);
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background-color: transparent;
-  color: var(--color-surface-text-muted);
   font-size: var(--font-size-xl);
   line-height: 1;
-  cursor: pointer;
-  transition:
-    background-color var(--duration-interaction) ease,
-    color var(--duration-interaction) ease;
-}
-
-.closeButton:hover {
-  background-color: var(--color-surface-hover);
-  color: var(--color-surface-text);
 }
 
 /* Отступ справа, чтобы содержимое не заходило под крестик. */

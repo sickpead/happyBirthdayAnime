@@ -1,0 +1,14 @@
+/* Положение слоя (fixed на весь экран или absolute внутри сцены) задаёт владелец. */
+.layer {
+  pointer-events: none;
+}
+
+/* Вне перехода слой невидим и не участвует в отрисовке. */
+.layer[data-phase='idle'] {
+  visibility: hidden;
+}
+
+/* Во время перехода блокирует клики по содержимому под облаками. */
+.layer:not([data-phase='idle']) {
+  pointer-events: auto;
+}

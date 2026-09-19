@@ -2,6 +2,8 @@
  * Слои наложения (z-index). Все уровни — только здесь, чтобы исключить «гонку» z-index.
  */
 export const Z_INDEX = {
+  /** Облака общего перехода: поверх сцен, но под иконкой проигрывателя — она «переживает» переходы. */
+  sceneTransition: 5,
   turntable: 10,
   /** Плавающие панели управления поверх сцены (в т.ч. dev-панель), но под модалками. */
   hud: 900,
@@ -32,15 +34,30 @@ export const FOCUS_RING = {
   offset: 3,
 } as const;
 
-/** Тени (уровни elevation). */
-export const SHADOWS = {
-  card: '0 24px 64px rgba(0, 0, 0, 0.45)',
+/** Иконка проигрывателя в правом верхнем углу (`CornerTurntable`), px. */
+export const CORNER_TURNTABLE = {
+  /** Ширина самой деки на иконке. */
+  deckWidth: 96,
+  /** Отступ деки от верхнего и правого края экрана. */
+  offset: 24,
 } as const;
 
-/** Проигрыватель в правом верхнем углу, px. */
-export const TURNTABLE_LAYOUT = {
-  size: 112,
-  offset: 24,
+/**
+ * Проигрыватель в сцене intro: ширина холста — `min(vw, vh)`, чтобы дека
+ * крупно и целиком помещалась на экране любой пропорции.
+ */
+export const INTRO_LAYOUT = {
+  deckCanvasMaxVw: 100,
+  deckCanvasMaxVh: 125,
+} as const;
+
+/**
+ * Торт в сцене Cake: высота — `min(vh, vw)`, ширина — по пропорциям торта,
+ * чтобы он целиком помещался на экране любой пропорции.
+ */
+export const CAKE_LAYOUT = {
+  heightMaxVh: 64,
+  heightMaxVw: 82,
 } as const;
 
 /** Базовое модальное окно, px. */

@@ -1,4 +1,5 @@
 .scene {
+  composes: scene-ambient-light from global;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -17,17 +18,5 @@
 }
 
 .nextButton {
-  padding: var(--space-md) var(--space-xl);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background-color: var(--color-accent);
-  color: var(--color-accent-contrast);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  transition: background-color var(--duration-interaction) ease;
-}
-
-.nextButton:hover {
-  background-color: var(--color-accent-hover);
+  composes: accent-button from global;
 }

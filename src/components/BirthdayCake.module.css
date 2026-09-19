@@ -1,0 +1,44 @@
+/*
+ * Контейнер торта: пропорции видимой области cake.png (см. cakeAssets.ts), все слои —
+ * в процентах от него. overflow не обрезается: дым поднимается выше рамки торта.
+ * Порядок слоёв: торт (1) → огни (2) → дым (3).
+ */
+.cake {
+  position: relative;
+  isolation: isolate;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cakeImage {
+  position: absolute;
+  z-index: 1;
+  max-width: none;
+}
+
+/* Огонь: рамка вокруг пламени, transform-origin — в основании на фитиле (задаётся инлайн). */
+.flame {
+  position: absolute;
+  z-index: 2;
+}
+
+/* Дым появляется только при задувании. */
+.smoke {
+  position: absolute;
+  z-index: 3;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Картинка-холст спрайта, сдвинутая так, что содержимое совпадает с рамкой. */
+.sprite {
+  position: absolute;
+  max-width: none;
+}
+
+/* Тёплое свечение вокруг пламени — золото из палитры. */
+.flame .sprite {
+  filter: drop-shadow(
+    0 0 var(--space-xs) color-mix(in srgb, var(--color-accent-gold) 75%, transparent)
+  );
+}

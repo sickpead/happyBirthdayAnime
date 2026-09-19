@@ -1,0 +1,38 @@
+.scene {
+  composes: scene-ambient-light from global;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  height: 100%;
+  padding: var(--space-xl);
+  overflow: hidden;
+}
+
+/* Заголовок сцены — для скринридеров; визуально сцену представляет сам торт. */
+.title {
+  composes: visually-hidden from global;
+}
+
+/* Высота — min(vh, vw), ширина — по пропорциям торта: торт целиком на экране любой формы. */
+.cake {
+  height: var(--cake-height);
+  max-width: 100%;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+}
+
+.button {
+  composes: accent-button from global;
+}
+
+/* Пока свечи гаснут, кнопка «Задуть свечу» неактивна. */
+.button:disabled {
+  cursor: default;
+  opacity: 0.6;
+  pointer-events: none;
+}

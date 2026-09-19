@@ -1,0 +1,112 @@
+/*
+ * Цветовые токены проекта — единственный источник цвета (и цветового освещения).
+ *
+ * Правила использования:
+ * - CSS и CSS-модули: только var(--color-…) и производные токены ниже;
+ * - TS / Three.js: readCssVariable() из src/styles/cssVariables.ts,
+ *   например new THREE.Color(readCssVariable('--color-accent-gold'));
+ * - хардкод цветов (hex / rgb / hsl) в компонентах запрещён, в TS/TSX это проверяет ESLint;
+ * - нецветовые токены (отступы, радиусы, тайминги, z-index) живут в src/constants
+ *   и публикуются в CSS через src/styles/cssVariables.ts.
+ *
+ * Файл подключается первым в src/main.tsx — до всех остальных стилей.
+ */
+
+:root {
+  /* фон / камень — сняты с кремово-серых стен и тропинок референса */
+  --color-bg-cream: #eaddc0;
+  --color-bg-cream-deep: #d8c9a8;
+  --color-stone-grey: #c9c2b0; /* холодноватый тёплый камень/тень на стенах и брусчатке — на референсе тени никогда не уходят в чистый серый, всегда с тёплым подмесом */
+
+  /* акценты — терракота снята с черепицы (лит/тень), шалфей — с листвы и мха на скалах референса (заметно холоднее и приглушённее "обычного" зелёного), золото — тёплый свет ламп/солнца, розовый — с цветов */
+  --color-accent-terracotta: #b85c3a;
+  --color-accent-terracotta-deep: #6f3b30; /* черепица в тени / состаренное дерево */
+  --color-accent-gold: #e8b563;
+  --color-accent-sage: #5f7d5e; /* было ближе к салатовому — на референсе зелень мутнее и холоднее, поправлено */
+  --color-accent-sage-deep: #33514c; /* тень зелени/мокрого камня, скалы в тени — на референсе этого тона очень много, он держит атмосферу */
+  --color-accent-dustyrose: #d99b8f;
+
+  /* текст */
+  --color-ink: #3a2a1e;
+  --color-ink-soft: #6b5a46;
+
+  /* служебное */
+  --color-overlay-dark: rgba(20, 14, 8, 0.94);
+
+  /* облака (переход между сценами) — единственное место в проекте, где допустим голубой:
+     настоящие облака визуально считываются как облака именно за счёт бело-голубого тона,
+     чисто тёплый золотисто-кремовый "туман" на облако не похож. Используем бело-голубой
+     как базу и тёплое золото как подсветку по краям (закатный свет на облаках) — так они
+     остаются в тоне общей палитры, но не теряют узнаваемость. За пределы облаков этот
+     голубой не выносить — фон intro/торта/стола остаётся кремово-терракотовым как есть. */
+  --color-sky-pale: #cfe0e6;
+  --color-sky-mist: #eaf1f2;
+  --color-cloud-base: var(--color-sky-pale);
+
+  /* небо (--gradient-sky-backdrop): фон сцен intro и cake и небо за облаками переходов — видно напрямую,
+     тёмно-синий → бирюзовый, как на референсе. Значения подобраны под палитру, замените своими при желании. */
+  --color-sky-deep: #285077; /* зенит: тёмно-синий */
+  --color-sky-horizon: #5caeb2; /* к горизонту — мягкий бирюзовый, дальше бледный sky-pale */
+}
+
+/*
+ * Производные токены: только ссылки на палитру выше (var / color-mix),
+ * новых «сырых» цветов здесь нет.
+ */
+:root {
+  /* Индикатор клавиатурного фокуса: самый тёмный тон палитры (≈ 10:1 к кремовому фону). */
+  --color-focus-ring: var(--color-ink);
+
+  /* Фон плавающих панелей поверх сцены. */
+  --color-panel: color-mix(in srgb, var(--color-bg-cream-deep) 92%, transparent);
+
+  /* Тени никогда не чисто чёрные: тон тени зелени и мокрого камня, как на референсе. */
+  --shadow-soft: 0 8px 24px color-mix(in srgb, var(--color-accent-sage-deep) 22%, transparent);
+  --shadow-card: 0 24px 64px color-mix(in srgb, var(--color-accent-sage-deep) 35%, transparent);
+
+  /*
+   * Свет сцены. На референсах сцену освещает мягкий тёплый источник (солнце или лампа):
+   * верх и один край объектов — золотистые, тень уходит в sage-deep / stone-grey, но не в чёрный.
+   * Фоновый слой света — утилита .scene-ambient-light (src/styles/global.css).
+   */
+  --ambient-light-origin: 12% 8%; /* откуда «светит» сцена; сцена может переопределить на своём корне */
+  --ambient-light-glow: color-mix(in srgb, var(--color-accent-gold) 9%, transparent);
+  --ambient-light-falloff: color-mix(in srgb, var(--color-bg-cream-deep) 45%, transparent);
+  --ambient-light-edge: color-mix(in srgb, var(--color-stone-grey) 40%, transparent);
+
+  /* Облака: мягкое тёплое свечение по краям (закатный свет) поверх бело-голубой базы. */
+  --color-cloud-glow: color-mix(in srgb, var(--color-accent-gold) 38%, transparent);
+
+  /*
+   * Небо: фон сцен Intro и Cake (SkyAmbientBackdrop — с мягкими облаками) и небо за облаками
+   * во всех облачных переходах. Сверху тёмно-синий, к горизонту бирюзовый, внизу бледный.
+   */
+  --gradient-sky-backdrop: linear-gradient(
+    to bottom,
+    var(--color-sky-deep) 0%,
+    var(--color-sky-horizon) 55%,
+    var(--color-sky-pale) 100%
+  );
+
+  /* Свет на объектах: золотистая подсветка освещённого края и тень теневой стороны. */
+  --object-light-highlight: color-mix(in srgb, var(--color-accent-gold) 24%, transparent);
+  --object-light-shade: color-mix(in srgb, var(--color-accent-sage-deep) 30%, transparent);
+
+  /*
+   * Предметы на столе в сцене Desk (значения для filter): мягкая тень под предметом,
+   * а при наведении и фокусе — тень ниже и тёплое золотое свечение, как будто предмет
+   * вот-вот возьмут в руки.
+   */
+  --desk-object-shadow: drop-shadow(
+    0 4px 6px color-mix(in srgb, var(--color-overlay-dark) 27%, transparent)
+  );
+  --desk-object-shadow-raised: drop-shadow(
+      0 12px 16px color-mix(in srgb, var(--color-overlay-dark) 37%, transparent)
+    )
+    drop-shadow(0 0 14px color-mix(in srgb, var(--color-accent-gold) 35%, transparent));
+
+  /* Лист-черновик, упавший в траву: тень мягче, шире и зеленее, чем на столешнице. */
+  --desk-sheet-shadow-grass: drop-shadow(
+    0 5px 10px color-mix(in srgb, var(--color-accent-sage-deep) 30%, transparent)
+  );
+}

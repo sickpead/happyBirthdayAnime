@@ -1,0 +1,59 @@
+/*
+ * Небо на всю сцену — под всем её содержимым. z-index: -1 работает внутри контекста наложения
+ * корня сцены (его создаёт утилита .scene-ambient-light).
+ */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--gradient-sky-backdrop);
+  pointer-events: none;
+}
+
+/* Облака проявляются и гаснут по пропу visible. */
+.clouds {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--duration-ambient-cloud-fade) ease;
+}
+
+.clouds[data-visible='true'] {
+  opacity: 1;
+}
+
+/* Медленный дрейф туда-обратно; амплитуда и полупериод — у каждого облака свои (инлайн). */
+.cloud {
+  position: absolute;
+  animation: sky-cloud-drift var(--drift-duration) ease-in-out infinite alternate;
+}
+
+@keyframes sky-cloud-drift {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(var(--drift-distance));
+  }
+}
+
+/* Бело-голубая база с тёплым золотистым свечением по краям — как у облаков шторки. */
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 var(--space-lg) var(--color-cloud-glow));
+  user-select: none;
+}
+
+.image[data-flipped='true'] {
+  transform: scaleX(-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud {
+    animation: none;
+  }
+}
