@@ -93,20 +93,11 @@
   --object-light-shade: color-mix(in srgb, var(--color-accent-sage-deep) 30%, transparent);
 
   /*
-   * Предметы на столе в сцене Desk (значения для filter): мягкая тень под предметом,
-   * а при наведении и фокусе — тень ниже и тёплое золотое свечение, как будто предмет
-   * вот-вот возьмут в руки.
+   * Предметы на столе в сцене Desk: при наведении и фокусе предмет обводит тёплое золотое
+   * свечение, как будто его вот-вот возьмут в руки (значение для filter). Тень под предметом
+   * рисуется отдельным слоем по настройкам из `src/utils/deskGrounding.ts`.
    */
-  --desk-object-shadow: drop-shadow(
-    0 4px 6px color-mix(in srgb, var(--color-overlay-dark) 27%, transparent)
-  );
-  --desk-object-shadow-raised: drop-shadow(
-      0 12px 16px color-mix(in srgb, var(--color-overlay-dark) 37%, transparent)
-    )
-    drop-shadow(0 0 14px color-mix(in srgb, var(--color-accent-gold) 35%, transparent));
-
-  /* Лист-черновик, упавший в траву: тень мягче, шире и зеленее, чем на столешнице. */
-  --desk-sheet-shadow-grass: drop-shadow(
-    0 5px 10px color-mix(in srgb, var(--color-accent-sage-deep) 30%, transparent)
+  --desk-object-glow: drop-shadow(
+    0 0 14px color-mix(in srgb, var(--color-accent-gold) 45%, transparent)
   );
 }

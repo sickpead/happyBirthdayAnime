@@ -21,6 +21,7 @@ export type {
   DeskHubComposedLayers,
   DeskHubDecorLayer,
   DeskHubDecorProp,
+  DeskHubGrounding,
   DeskHubHoverReveal,
   DeskHubLayerTransform,
   DeskHubObjectId,
@@ -30,7 +31,7 @@ export type {
   DeskTransitionType,
   DeskZoomStage,
 } from './desk';
-export type { ContentModalProps, ModalId, ModalProps } from './modal';
+export type { ContentModalProps, ModalId, ModalProps, StubModalId } from './modal';
 export type { IntroSceneProps, SceneName, SceneProps } from './scene';
 export type {
   CloudTransitionTimings,

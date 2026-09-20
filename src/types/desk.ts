@@ -53,7 +53,8 @@ export interface DeskZoomStage {
  * приподнять и покачивать, просто приподнять; `crossfade-open` — приподнять и «открыть»:
  * картинка закрытого предмета перетекает в `imageSrcOpen`; `tonearm-swing` — сам предмет
  * стоит на месте, а поворачивается только тонарм его составной картинки
- * (см. {@link DeskHubComposedLayers}); `light-candles` — на фитилях загораются огни.
+ * (см. {@link DeskHubComposedLayers}); `light-candles` — на фитилях загораются огни;
+ * `stack-sway` — стопка приподнимается и покачивается, будто верхняя пластинка съезжает.
  */
 export type DeskHoverStyle =
   | 'lift-tilt'
@@ -62,7 +63,8 @@ export type DeskHoverStyle =
   | 'lift-only'
   | 'crossfade-open'
   | 'tonearm-swing'
-  | 'light-candles';
+  | 'light-candles'
+  | 'stack-sway';
 
 /**
  * Размер и сдвиг картинки «открытого» предмета относительно хитбокса — для предметов,
@@ -117,7 +119,30 @@ export interface DeskHubComposedLayers {
 }
 
 /** Предмет на столе в стадии HUB. */
-export type DeskHubObjectId = 'cake' | 'letter' | 'book' | 'turntable';
+export type DeskHubObjectId =
+  | 'cake'
+  | 'letter'
+  | 'book'
+  | 'turntable'
+  | 'vinyl-stack'
+  | 'rose-vase'
+  | 'colored-pencils'
+  | 'fountain-pen';
+
+/**
+ * Цветокоррекция картинки предмета — чтобы он не выглядел наклейкой поверх фона, а попадал
+ * в тёплый закатный свет сцены. Значения по умолчанию — в `src/utils/deskGrounding.ts`.
+ *
+ * Тени под предметами нет: свет уже нарисован на самих картинках.
+ */
+export interface DeskHubGrounding {
+  /** Поворот оттенка картинки, градусы (по умолчанию 0). */
+  hueRotateDeg?: number;
+  /** Насыщенность картинки, % (по умолчанию 100). */
+  saturatePercent?: number;
+  /** Яркость картинки, % (по умолчанию 100). */
+  brightnessPercent?: number;
+}
 
 /**
  * Где лежит декорация относительно кликабельных предметов: `below` — под ними (ваза,
@@ -156,10 +181,7 @@ export interface DeskDraftSheetModal {
   caption?: string;
 }
 
-/**
- * Куда «лёг» лист: на столешницу или в траву. Влияет только на тень под ним —
- * в траве она мягче и зеленее.
- */
+/** Куда «лёг» лист: на столешницу или в траву. Сейчас только помечает место в конфиге. */
 export type DeskDraftSurface = 'table' | 'grass';
 
 /**
@@ -180,8 +202,10 @@ export interface DeskDraftSheet {
   widthPercent: number;
   /** Наклон листа, градусы (положительный — по часовой стрелке). */
   rotateDeg: number;
-  /** Где лежит лист — только для тени. */
+  /** Где лежит лист — на столе или в траве. */
   surface: DeskDraftSurface;
+  /** Цветокоррекция картинки. Если не задано — общая (см. `getDraftSheetGrounding`). */
+  grounding?: DeskHubGrounding;
   /** Содержимое модалки этого листа. */
   modal: DeskDraftSheetModal;
 }
@@ -233,6 +257,16 @@ export interface DeskHubObjectLayer {
    * Сохраняется при наведении и фокусе у `crossfade-open` — открываясь, предмет не выпрямляется.
    */
   restRotationDeg?: number;
+  /**
+   * Цветокоррекция картинки предмета (см. `src/utils/deskGrounding.ts`); без этого поля
+   * картинка показывается как есть.
+   */
+  grounding?: DeskHubGrounding;
+  /**
+   * Явный `z-index`, когда предмет должен лежать поверх соседа независимо от порядка
+   * в массиве (карандаши и ручка — поверх книги). По умолчанию порядок задаёт массив.
+   */
+  zIndexOverride?: number;
   /** Модалка, которая открывается по клику. */
   modalId: ModalId;
   /** Реакция на наведение. */

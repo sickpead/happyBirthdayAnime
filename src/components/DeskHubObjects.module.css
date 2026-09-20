@@ -8,7 +8,8 @@
 /*
  * Декор: картинки для атмосферы. Координаты в конфиге — центр предмета, поэтому картинка
  * сдвигается на половину себя; наклон задаётся инлайн (rotate). Клики и наведение проходят
- * насквозь — реагируют только кнопки предметов.
+ * насквозь — реагируют только кнопки предметов. Тени у декора нет: он плоский, в отличие
+ * от кликабельных предметов.
  */
 .decor {
   position: absolute;
@@ -17,15 +18,18 @@
   pointer-events: none;
   user-select: none;
   translate: -50% -50%;
-  filter: var(--desk-object-shadow);
 }
 
 /*
- * Предмет — кнопка без собственного фона: видна только картинка с мягкой тенью.
- * Основание остаётся на месте, предмет «приподнимается» от него.
- * --rest-rotation-deg — постоянный наклон предмета из конфига (restRotationDeg, по умолчанию 0).
+ * Предмет — кнопка без собственного фона: видна только картинка. Тени под предметами нет:
+ * свет уже нарисован на самих картинках. Кнопка только стоит на месте — она держит клик,
+ * фокус и позицию, а наклон и движение при наведении живут на `.content`.
  */
 .object {
+  /* Цветокоррекция картинок предмета — одной строкой, чтобы добавлять к ней свечение. */
+  --grounding-color: hue-rotate(var(--grounding-hue, 0deg))
+    saturate(var(--grounding-saturate, 100%)) brightness(var(--grounding-brightness, 100%));
+
   position: absolute;
   padding: 0;
   border: 0;
@@ -33,46 +37,58 @@
   background: none;
   cursor: pointer;
   pointer-events: auto;
-  transform-origin: 50% 100%;
-  transform: rotate(var(--rest-rotation-deg, 0deg));
-  filter: var(--desk-object-shadow);
 }
 
 /*
- * Тень ниже и тёплое свечение — и при prefers-reduced-motion. Приподнятый предмет встаёт
+ * Видимая часть предмета: картинка и её слои. Она наклоняется в покое
+ * (--rest-rotation-deg из конфига) и двигается при наведении, а кнопка остаётся на месте.
+ */
+.content {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  transform-origin: 50% 100%;
+  transform: rotate(var(--rest-rotation-deg, 0deg));
+}
+
+/* Картинки предмета подкрашены под тёплый свет сцены; огни свечей — со своим свечением. */
+.image,
+.openImage,
+.hoverReveal,
+.vinylLayer,
+.tonearmLayer {
+  filter: var(--grounding-color);
+}
+
+/*
+ * Тёплое свечение по силуэту — и при prefers-reduced-motion. Приподнятый предмет встаёт
  * поверх соседей, даже если по порядку в конфиге лежит под ними.
  */
 .object:hover,
 .object:focus-visible {
   z-index: 1;
-  filter: var(--desk-object-shadow-raised);
 }
 
-/*
- * Предмет уже на картинке стола: кнопка только ловит клик. Без filter и без подъёма —
- * двигаться нечему, а drop-shadow пустой кнопки дал бы прямоугольное пятно.
- */
-.object[data-painted-in-backdrop='true'] {
-  filter: none;
-}
-
-.object[data-painted-in-backdrop='true']:hover,
-.object[data-painted-in-backdrop='true']:focus-visible {
-  filter: none;
+.object:hover .image,
+.object:focus-visible .image,
+.object:hover .openImage,
+.object:focus-visible .openImage,
+.object:hover .hoverReveal,
+.object:focus-visible .hoverReveal,
+.object:hover .vinylLayer,
+.object:focus-visible .vinylLayer,
+.object:hover .tonearmLayer,
+.object:focus-visible .tonearmLayer {
+  filter: var(--grounding-color) var(--desk-object-glow);
 }
 
 /*
  * Лист-черновик: та же кнопка, что и у предмета, но координаты в конфиге — центр листа,
- * поэтому он сдвигается на половину себя. Упавший в траву лист отбрасывает более мягкую
- * и зеленоватую тень, чем лежащий на столешнице.
+ * поэтому он сдвигается на половину себя.
  */
 .sheet {
   translate: -50% -50%;
-}
-
-.sheet[data-surface='grass'] {
-  /* Переопределяем сам токен тени, чтобы подъём при наведении остался общим. */
-  --desk-object-shadow: var(--desk-sheet-shadow-grass);
 }
 
 .image {
@@ -208,26 +224,38 @@
 
 /* Движение — только если пользователь не просил его уменьшить. */
 @media (prefers-reduced-motion: no-preference) {
-  .object {
+  .content {
+    transition: transform var(--duration-desk-object-hover) ease-out;
+  }
+
+  /* Свечение силуэта — тем же темпом, что и подъём предмета. */
+  .image,
+  .openImage,
+  .hoverReveal,
+  .vinylLayer {
     transition:
-      transform var(--duration-desk-object-hover) ease-out,
-      filter var(--duration-desk-object-hover) ease-out;
+      filter var(--duration-desk-object-hover) ease-out,
+      opacity var(--duration-desk-object-hover) ease-out;
   }
 
   .tonearmLayer {
-    transition: transform var(--duration-desk-tonearm-swing) ease-out;
+    transition:
+      transform var(--duration-desk-tonearm-swing) ease-out,
+      filter var(--duration-desk-object-hover) ease-out;
   }
 
   .crossfade .image,
   .openImage,
-  .hoverReveal,
   .deskFlame {
-    transition: opacity var(--duration-desk-object-hover) ease-out;
+    transition:
+      opacity var(--duration-desk-object-hover) ease-out,
+      filter var(--duration-desk-object-hover) ease-out;
   }
 
   .hoverReveal {
     transition:
       opacity var(--duration-desk-object-hover) ease-out,
+      filter var(--duration-desk-object-hover) ease-out,
       scale var(--duration-desk-object-hover) ease-out;
   }
 
@@ -243,41 +271,52 @@
   }
 
   /* Письмо: приподняли и открыли — под тем же наклоном, что и в покое, не выпрямляя. */
-  .object[data-hover-style='crossfade-open']:hover,
-  .object[data-hover-style='crossfade-open']:focus-visible {
+  .object[data-hover-style='crossfade-open']:hover .content,
+  .object[data-hover-style='crossfade-open']:focus-visible .content {
     transform: translateY(-5%) scale(1.05) rotate(var(--rest-rotation-deg, 0deg));
   }
 
   /* Торт: приподняли и чуть наклонили. */
-  .object[data-hover-style='lift-tilt']:hover,
-  .object[data-hover-style='lift-tilt']:focus-visible {
+  .object[data-hover-style='lift-tilt']:hover .content,
+  .object[data-hover-style='lift-tilt']:focus-visible .content {
     transform: translateY(-6%) scale(1.06) rotate(-2deg);
   }
 
   /* Книга: приподняли и повернули. */
-  .object[data-hover-style='lift-rotate']:hover,
-  .object[data-hover-style='lift-rotate']:focus-visible {
+  .object[data-hover-style='lift-rotate']:hover .content,
+  .object[data-hover-style='lift-rotate']:focus-visible .content {
     transform: translateY(-7%) scale(1.07) rotate(4deg);
   }
 
   /* Просто мягкий подъём, без поворота. */
-  .object[data-hover-style='lift-only']:hover,
-  .object[data-hover-style='lift-only']:focus-visible {
+  .object[data-hover-style='lift-only']:hover .content,
+  .object[data-hover-style='lift-only']:focus-visible .content {
     transform: translateY(-5%) scale(1.05);
+  }
+
+  /*
+   * Стопка пластинок: приподнимается и медленно покачивается с боку на бок, будто верхняя
+   * пластинка вот-вот съедет. Качание — отдельными свойствами rotate и translate, чтобы
+   * подъём остался на transform и, как у остальных предметов, плавно появлялся и уходил.
+   */
+  .object[data-hover-style='stack-sway']:hover .content,
+  .object[data-hover-style='stack-sway']:focus-visible .content {
+    transform: translateY(-4%) scale(1.04);
+    animation: desk-stack-sway var(--duration-desk-stack-sway) ease-in-out infinite;
   }
 
   /*
    * Черновики: бумага «шелестит» — приподнимается и покачивается, пока курсор на ней.
    * Наклон листа из конфига сохраняется, иначе лист выпрямлялся бы под курсором.
    */
-  .object[data-hover-style='lift-wiggle']:hover,
-  .object[data-hover-style='lift-wiggle']:focus-visible {
+  .object[data-hover-style='lift-wiggle']:hover .content,
+  .object[data-hover-style='lift-wiggle']:focus-visible .content {
     transform: translateY(-6%) scale(1.05) rotate(var(--rest-rotation-deg, 0deg));
     animation: wiggle var(--duration-desk-object-wiggle) infinite;
   }
 
-  .object[data-painted-in-backdrop='true']:hover,
-  .object[data-painted-in-backdrop='true']:focus-visible {
+  .object[data-painted-in-backdrop='true']:hover .content,
+  .object[data-painted-in-backdrop='true']:focus-visible .content {
     transform: rotate(var(--rest-rotation-deg, 0deg));
     animation: none;
   }
@@ -312,6 +351,28 @@
     scale: 0.94 1.06;
     rotate: -3deg;
     opacity: 0.96;
+  }
+}
+
+/*
+ * Качание стопки: центр тяжести гуляет вправо-влево, поэтому поворот идёт вместе
+ * с небольшим сдвигом — так стопка «оседает» на бок, а не вращается на месте.
+ */
+@keyframes desk-stack-sway {
+  0%,
+  100% {
+    rotate: 0deg;
+    translate: 0 0;
+  }
+
+  30% {
+    rotate: -1.6deg;
+    translate: -0.8% 0.4%;
+  }
+
+  65% {
+    rotate: 1.4deg;
+    translate: 0.8% 0.2%;
   }
 }
 

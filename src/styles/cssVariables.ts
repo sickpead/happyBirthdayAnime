@@ -3,6 +3,7 @@ import {
   DESK_FLAME_FLICKER_MS,
   DESK_OBJECT_HOVER_MS,
   DESK_OBJECT_WIGGLE_MS,
+  DESK_STACK_SWAY_MS,
   DESK_TONEARM_SWING_MS,
 } from '../constants/deskTimings';
 import { VINYL_SPIN_MS_PER_ROTATION } from '../constants/introTimings';
@@ -118,6 +119,7 @@ export const CSS_VARIABLES = {
   '--duration-desk-object-hover': ms(DESK_OBJECT_HOVER_MS),
   '--duration-desk-object-wiggle': ms(DESK_OBJECT_WIGGLE_MS),
   '--duration-desk-tonearm-swing': ms(DESK_TONEARM_SWING_MS),
+  '--duration-desk-stack-sway': ms(DESK_STACK_SWAY_MS),
   '--duration-desk-flame-flicker': ms(DESK_FLAME_FLICKER_MS),
 
   '--turntable-aspect-ratio': `${String(TURNTABLE_CANVAS.width)} / ${String(TURNTABLE_CANVAS.height)}`,

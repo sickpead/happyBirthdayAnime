@@ -1,6 +1,8 @@
-import type { DeskHubObjectId, DeskHubObjectLayer } from '../types';
+﻿import type { DeskHubObjectId, DeskHubObjectLayer } from '../types';
 import { assetUrl } from '../utils/assetUrl';
+import { DEFAULT_DESK_HUB_GROUNDING } from '../utils/deskGrounding';
 import { CAKE_IMAGES } from './cakeAssets';
+import { DESK_DECOR_DIRECTORY } from './deskHubDecor';
 import { DESK_ASSET_DIRECTORY } from './deskZoomStages';
 
 /**
@@ -22,6 +24,32 @@ import { DESK_ASSET_DIRECTORY } from './deskZoomStages';
  */
 export const DESK_HUB_OBJECTS: readonly DeskHubObjectLayer[] = [
   {
+    id: 'rose-vase',
+    label: 'Ваза с белыми розами',
+    imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/rose-vase.png`),
+    // За дальним краем стола, по центру кадра (центр слоя — 55.9 / 14.9).
+    xPercent: 50.6,
+    yPercent: 1.7,
+    widthPercent: 10.8,
+    grounding: DEFAULT_DESK_HUB_GROUNDING,
+    modalId: 'rose-vase',
+    // Цветы чуть покачиваются, как будто их тронуло ветром.
+    hoverStyle: 'lift-wiggle',
+  },
+  {
+    id: 'vinyl-stack',
+    label: 'Стопка виниловых пластинок',
+    imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/vinyl-stack.png`),
+    // На траве справа, у ножки стола (центр слоя — 88.5 / 65.5).
+    xPercent: 81.8,
+    yPercent: 55.6,
+    widthPercent: 13.4,
+    grounding: DEFAULT_DESK_HUB_GROUNDING,
+    modalId: 'vinyl-stack',
+    // Стопка приподнимается и покачивается, будто верхняя пластинка вот-вот съедет.
+    hoverStyle: 'stack-sway',
+  },
+  {
     id: 'cake',
     label: 'Торт',
     imageSrc: assetUrl(`${DESK_ASSET_DIRECTORY}/cake-on-desk.png`),
@@ -30,6 +58,7 @@ export const DESK_HUB_OBJECTS: readonly DeskHubObjectLayer[] = [
     yPercent: -1.9,
     widthPercent: 14.4,
     restRotationDeg: 1,
+    grounding: DEFAULT_DESK_HUB_GROUNDING,
     modalId: 'cakeVideo',
     hoverStyle: 'light-candles',
     // Кончики фитилей, % слоя торта (сняты с `cake-on-desk.png`); подгоняются на глаз.
@@ -51,6 +80,7 @@ export const DESK_HUB_OBJECTS: readonly DeskHubObjectLayer[] = [
     yPercent: 58.7,
     widthPercent: 12.4,
     restRotationDeg: -8,
+    grounding: DEFAULT_DESK_HUB_GROUNDING,
     // Открытый конверт чуть больше закрытого; клапан уходит вверх, поэтому оверлей
     // поднят так, чтобы низ конверта остался на месте.
     hoverReveal: {
@@ -70,6 +100,7 @@ export const DESK_HUB_OBJECTS: readonly DeskHubObjectLayer[] = [
     xPercent: 38.2,
     yPercent: 26.3,
     widthPercent: 20.6,
+    grounding: DEFAULT_DESK_HUB_GROUNDING,
     hoverReveal: {
       widthPercent: 260,
       heightPercent: 210,
@@ -86,6 +117,7 @@ export const DESK_HUB_OBJECTS: readonly DeskHubObjectLayer[] = [
     xPercent: 59.2,
     yPercent: 13.3,
     widthPercent: 20.2,
+    grounding: DEFAULT_DESK_HUB_GROUNDING,
     modalId: 'playlist',
     hoverStyle: 'tonearm-swing',
     layers: {
@@ -102,6 +134,35 @@ export const DESK_HUB_OBJECTS: readonly DeskHubObjectLayer[] = [
         hoverRotationDeg: -8,
       },
     },
+  },
+  {
+    id: 'colored-pencils',
+    label: 'Цветные карандаши',
+    imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/colored-pencils.png`),
+    // На столешнице справа от книги (центр слоя — 62.8 / 36.7).
+    xPercent: 57.7,
+    yPercent: 32.2,
+    widthPercent: 9.1,
+    restRotationDeg: 8,
+    grounding: DEFAULT_DESK_HUB_GROUNDING,
+    // Лежат поверх книги, а не под ней.
+    zIndexOverride: 5,
+    modalId: 'colored-pencils',
+    hoverStyle: 'lift-rotate',
+  },
+  {
+    id: 'fountain-pen',
+    label: 'Перьевая ручка',
+    imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/fountain-pen.png`),
+    // На столешнице слева от книги (центр слоя — 35.9 / 37.6).
+    xPercent: 33.6,
+    yPercent: 34.1,
+    widthPercent: 6.1,
+    restRotationDeg: -12,
+    grounding: DEFAULT_DESK_HUB_GROUNDING,
+    zIndexOverride: 5,
+    modalId: 'fountain-pen',
+    hoverStyle: 'lift-only',
   },
 ];
 

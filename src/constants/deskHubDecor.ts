@@ -1,14 +1,17 @@
 import type { DeskHubDecorProp } from '../types';
-import { assetUrl } from '../utils/assetUrl';
 import { DESK_ASSET_DIRECTORY } from './deskZoomStages';
 
 /** Каталог декоративных картинок стадии HUB внутри `public/`. */
 export const DESK_DECOR_DIRECTORY = `${DESK_ASSET_DIRECTORY}/decor`;
 
 /**
- * Декор стола: ваза с розами и стопка пластинок на траве, ручка и карандаши на столешнице.
- * Только для атмосферы — без клика, наведения и модалок. Листы-черновики с собственными
- * модалками живут отдельно, в `deskDraftSheets.ts`.
+ * Чисто декоративные предметы стола: картинка и ничего больше — без клика, наведения
+ * и модалок.
+ *
+ * Сейчас массив пуст: ваза с розами, стопка пластинок, ручка и карандаши стали
+ * кликабельными и переехали в `deskHubObjects.ts`, а листы-черновики со своими модалками
+ * живут в `deskDraftSheets.ts`. Механика декора осталась — добавьте сюда запись, и картинка
+ * снова появится на столе.
  *
  * `xPercent` / `yPercent` — центр предмета в процентах картинки стола (у кликабельных
  * предметов в `deskHubObjects.ts` это левый верхний угол), `widthPercent` — ширина в процентах
@@ -22,46 +25,7 @@ export const DESK_DECOR_DIRECTORY = `${DESK_ASSET_DIRECTORY}/decor`;
  * Раскладка подгоняется на глаз, код менять не нужно: откройте стадию с `?layout=1`
  * (см. README) и перетащите предметы мышью.
  */
-export const DESK_HUB_DECOR: readonly DeskHubDecorProp[] = [
-  // За дальним краем стола, по центру кадра.
-  {
-    id: 'rose-vase',
-    imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/rose-vase.png`),
-    xPercent: 55.7,
-    yPercent: 15.6,
-    widthPercent: 34.2,
-    layer: 'below',
-  },
-  // На траве справа, у ножки стола.
-  {
-    id: 'vinyl-stack',
-    imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/vinyl-stack.png`),
-    xPercent: 88.2,
-    yPercent: 65.4,
-    widthPercent: 21.8,
-    layer: 'below',
-  },
-  // На столешнице слева от книги — поверх неё, а не под ней.
-  {
-    id: 'fountain-pen',
-    imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/fountain-pen.png`),
-    xPercent: 35.7,
-    yPercent: 37.8,
-    widthPercent: 11.5,
-    rotateDeg: -12,
-    layer: 'above',
-  },
-  // На столешнице справа от книги.
-  {
-    id: 'colored-pencils',
-    imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/colored-pencils.png`),
-    xPercent: 62,
-    yPercent: 36.8,
-    widthPercent: 12.6,
-    rotateDeg: 8,
-    layer: 'above',
-  },
-];
+export const DESK_HUB_DECOR: readonly DeskHubDecorProp[] = [];
 
 /** URL декоративных картинок — для предзагрузки. */
 export const DESK_HUB_DECOR_SOURCES: Readonly<Record<string, string>> = Object.fromEntries(

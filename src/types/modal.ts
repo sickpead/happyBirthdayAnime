@@ -1,7 +1,13 @@
 import type { ReactNode } from 'react';
 
+/**
+ * Модалки-заглушки предметов стола: содержимого у них пока нет, только заголовок
+ * и строка-обещание из `src/constants/stubModalContent.ts`.
+ */
+export type StubModalId = 'vinyl-stack' | 'rose-vase' | 'colored-pencils' | 'fountain-pen';
+
 /** Идентификатор модального окна с контентом. */
-export type ModalId = 'book' | 'letter' | 'drafts' | 'cakeVideo' | 'playlist';
+export type ModalId = 'book' | 'letter' | 'drafts' | 'cakeVideo' | 'playlist' | StubModalId;
 
 /** Пропсы базового компонента `Modal`. */
 export interface ModalProps {

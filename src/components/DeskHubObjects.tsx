@@ -2,6 +2,7 @@ import { useState, type CSSProperties, type ReactElement } from 'react';
 
 import { CAKE_IMAGES, CAKE_SPRITE_CANVAS, FLAME_SPRITE } from '../constants/cakeAssets';
 import { DESK_TEXT } from '../constants/copy';
+import { getDraftSheetGrounding } from '../constants/deskDraftSheets';
 import { deskHubLayerKey } from '../constants/deskHubObjects';
 import type { PreloadedImage } from '../hooks/usePreloadedImages';
 import type {
@@ -18,6 +19,7 @@ import type {
   ModalId,
 } from '../types';
 import { classNames } from '../utils/classNames';
+import { groundingToCssVars, type GroundingStyle } from '../utils/deskGrounding';
 import styles from './DeskHubObjects.module.css';
 import { DraftSheetModal } from './modals/DraftSheetModal';
 
@@ -41,7 +43,7 @@ export interface DeskHubObjectsProps {
   onSelect: (modalId: ModalId) => void;
 }
 
-type ObjectStyle = CSSProperties & Record<'--rest-rotation-deg', string>;
+type ObjectStyle = GroundingStyle & Record<'--rest-rotation-deg', string>;
 type LayerStyle = CSSProperties &
   Record<'--layer-scale' | '--layer-offset-x' | '--layer-offset-y', string>;
 type TonearmLayerStyle = LayerStyle &
@@ -117,6 +119,7 @@ function decorStyle(prop: DeskHubDecorProp): DecorStyle {
 /** Лист-черновик: координаты — центр листа (как у декора), наклон — постоянный. */
 function sheetStyle(sheet: DeskDraftSheet): ObjectStyle {
   return {
+    ...groundingToCssVars(getDraftSheetGrounding(sheet)),
     left: percent(sheet.xPercent),
     top: percent(sheet.yPercent),
     width: percent(sheet.widthPercent),
@@ -189,14 +192,19 @@ function flameStyle(candle: CakeCandlePosition): FlameStyle {
  * и перетекает из закрытой картинки в открытую (`imageSrcOpen`); у составного предмета со
  * стилем `tonearm-swing` (проигрыватель: корпус, пластинка и тонарм отдельными слоями)
  * предмет стоит на месте, а тонарм поворачивается вокруг своей оси к пластинке;
- * `light-candles` зажигает огни на фитилях. Предмет с `restRotationDeg` постоянно лежит
+ * `light-candles` зажигает огни на фитилях; `stack-sway` покачивает стопку пластинок. Предмет с `restRotationDeg` постоянно лежит
  * под этим углом, в том числе когда открывается. При `prefers-reduced-motion` предметы не
  * двигаются: открытая картинка, огни и новое положение тонарма появляются без анимации.
  * Нарисованный на фоне предмет сам не двигается — двигается только оверлей (открытая
  * картинка или огни).
  *
+ * Кнопка предмета — два уровня: сама кнопка стоит на месте (позиция, клик, фокус и тень),
+ * а вложенный `content` держит картинку и все её слои. Наклон покоя и движение при наведении
+ * живут на `content`, поэтому тень не поворачивается вместе с предметом и не уезжает за ним.
+ *
  * Порядок наложения: декор слоя `below` → листы-черновики → кнопки предметов → декор слоя
- * `above`. Декор кликов не перехватывает ни в том, ни в другом слое; листы — кнопки со своими
+ * `above`; предмет с `zIndexOverride` встаёт поверх соседей независимо от этого порядка.
+ * Декор кликов не перехватывает ни в том, ни в другом слое; листы — кнопки со своими
  * модалками (`sheets`, состояние `openDraftId` здесь же), реагируют на наведение как бумага.
  * Координаты декора и листов — центр картинки, у предметов — левый верхний угол.
  *
@@ -236,13 +244,15 @@ export function DeskHubObjects({
               setOpenDraftId(sheet.id);
             }}
           >
-            <img
-              className={styles.image}
-              src={sheet.imageSrc}
-              alt=""
-              decoding="async"
-              draggable={false}
-            />
+            <span className={styles.content}>
+              <img
+                className={styles.image}
+                src={sheet.imageSrc}
+                alt=""
+                decoding="async"
+                draggable={false}
+              />
+            </span>
           </button>
         ) : null,
       )}
@@ -253,12 +263,15 @@ export function DeskHubObjects({
           return null;
         }
         const style: ObjectStyle = {
+          ...groundingToCssVars(object.grounding),
           left: percent(object.xPercent),
           top: percent(object.yPercent),
           width: percent(object.widthPercent),
           ...(isPaintedInBackdrop && object.heightPercent !== undefined
             ? { height: percent(object.heightPercent) }
             : {}),
+          // Порядок наложения обычно задаёт массив; здесь — явное исключение из конфига.
+          ...(object.zIndexOverride === undefined ? {} : { zIndex: object.zIndexOverride }),
           '--rest-rotation-deg': deg(object.restRotationDeg ?? 0),
         };
         const baseImage =
@@ -324,57 +337,59 @@ export function DeskHubObjects({
               onSelect(object.modalId);
             }}
           >
-            {isPaintedInBackdrop ? (
-              paintedHover
-            ) : layers ? (
-              <span className={styles.composed}>
-                {baseImage}
-                {isReady(layerImages[deskHubLayerKey(object.id, 'vinyl')]) && (
-                  <img
-                    className={styles.vinylLayer}
-                    src={layers.vinylSrc}
-                    alt=""
-                    style={layerStyle(layers.vinyl)}
-                    decoding="async"
-                    draggable={false}
-                    data-desk-object-layer="vinyl"
-                  />
-                )}
-                {isReady(layerImages[deskHubLayerKey(object.id, 'tonearm')]) && (
-                  <img
-                    className={styles.tonearmLayer}
-                    src={layers.tonearmSrc}
-                    alt=""
-                    style={tonearmStyle(layers.tonearm)}
-                    decoding="async"
-                    draggable={false}
-                    data-desk-object-layer="tonearm"
-                  />
-                )}
-                {flames}
-              </span>
-            ) : imageSrcOpen === undefined ? (
-              // Огни зажигаются на фитилях самой картинки, поэтому она задаёт им холст.
-              <span className={styles.composed}>
-                {baseImage}
-                {flames}
-              </span>
-            ) : (
-              // crossfade-open: закрытая картинка в потоке задаёт размер, открытая лежит поверх.
-              <span className={styles.crossfade} data-has-open={isOpenImageReady}>
-                {baseImage}
-                {isOpenImageReady && (
-                  <img
-                    className={styles.openImage}
-                    src={imageSrcOpen}
-                    alt=""
-                    decoding="async"
-                    draggable={false}
-                    data-desk-object-layer="open"
-                  />
-                )}
-              </span>
-            )}
+            <span className={styles.content}>
+              {isPaintedInBackdrop ? (
+                paintedHover
+              ) : layers ? (
+                <span className={styles.composed}>
+                  {baseImage}
+                  {isReady(layerImages[deskHubLayerKey(object.id, 'vinyl')]) && (
+                    <img
+                      className={styles.vinylLayer}
+                      src={layers.vinylSrc}
+                      alt=""
+                      style={layerStyle(layers.vinyl)}
+                      decoding="async"
+                      draggable={false}
+                      data-desk-object-layer="vinyl"
+                    />
+                  )}
+                  {isReady(layerImages[deskHubLayerKey(object.id, 'tonearm')]) && (
+                    <img
+                      className={styles.tonearmLayer}
+                      src={layers.tonearmSrc}
+                      alt=""
+                      style={tonearmStyle(layers.tonearm)}
+                      decoding="async"
+                      draggable={false}
+                      data-desk-object-layer="tonearm"
+                    />
+                  )}
+                  {flames}
+                </span>
+              ) : imageSrcOpen === undefined ? (
+                // Огни зажигаются на фитилях самой картинки, поэтому она задаёт им холст.
+                <span className={styles.composed}>
+                  {baseImage}
+                  {flames}
+                </span>
+              ) : (
+                // crossfade-open: закрытая картинка в потоке задаёт размер, открытая лежит поверх.
+                <span className={styles.crossfade} data-has-open={isOpenImageReady}>
+                  {baseImage}
+                  {isOpenImageReady && (
+                    <img
+                      className={styles.openImage}
+                      src={imageSrcOpen}
+                      alt=""
+                      decoding="async"
+                      draggable={false}
+                      data-desk-object-layer="open"
+                    />
+                  )}
+                </span>
+              )}
+            </span>
           </button>
         );
       })}

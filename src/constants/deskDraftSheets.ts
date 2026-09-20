@@ -1,5 +1,6 @@
-import type { DeskDraftSheet } from '../types';
+import type { DeskDraftSheet, DeskHubGrounding } from '../types';
 import { assetUrl } from '../utils/assetUrl';
+import { DEFAULT_DESK_HUB_GROUNDING } from '../utils/deskGrounding';
 import { DESK_DECOR_DIRECTORY } from './deskHubDecor';
 
 /**
@@ -25,9 +26,9 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     id: 'draft-1',
     label: 'Черновик: первый набросок',
     imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/scrap-paper-1.png`),
-    xPercent: 43.1,
-    yPercent: 23.1,
-    widthPercent: 8.4,
+    xPercent: 42.7,
+    yPercent: 23,
+    widthPercent: 3.2,
     rotateDeg: -15,
     surface: 'table',
     modal: {
@@ -40,9 +41,9 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     id: 'draft-2',
     label: 'Черновик: карта истории',
     imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/story-map.png`),
-    xPercent: 75.2,
-    yPercent: 38.6,
-    widthPercent: 14.2,
+    xPercent: 75.9,
+    yPercent: 39,
+    widthPercent: 12.9,
     rotateDeg: 12,
     surface: 'table',
     modal: {
@@ -55,9 +56,9 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     id: 'draft-3',
     label: 'Черновик: стопка листов',
     imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/paper-fan.png`),
-    xPercent: 25.4,
-    yPercent: 36.3,
-    widthPercent: 23.4,
+    xPercent: 25.5,
+    yPercent: 36.1,
+    widthPercent: 19.5,
     rotateDeg: 6,
     surface: 'table',
     modal: {
@@ -70,9 +71,9 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     id: 'draft-4',
     label: 'Черновик: смятая попытка',
     imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/scrap-paper-2.png`),
-    xPercent: 11.5,
-    yPercent: 70.9,
-    widthPercent: 9.4,
+    xPercent: 11.2,
+    yPercent: 71,
+    widthPercent: 4.6,
     rotateDeg: -8,
     surface: 'grass',
     modal: {
@@ -85,9 +86,9 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     id: 'draft-5',
     label: 'Черновик: зачёркнутая страница',
     imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/scrap-paper-3.png`),
-    xPercent: 26.2,
+    xPercent: 26.3,
     yPercent: 82.2,
-    widthPercent: 17,
+    widthPercent: 8.9,
     rotateDeg: 18,
     surface: 'grass',
     modal: {
@@ -100,9 +101,9 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     id: 'draft-6',
     label: 'Черновик: выброшенный лист',
     imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/scrap-paper-1.png`),
-    xPercent: 31.4,
-    yPercent: 66.2,
-    widthPercent: 9.6,
+    xPercent: 30.9,
+    yPercent: 66.1,
+    widthPercent: 3.6,
     rotateDeg: -20,
     surface: 'grass',
     modal: {
@@ -115,9 +116,9 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     id: 'draft-7',
     label: 'Черновик: последняя попытка',
     imageSrc: assetUrl(`${DESK_DECOR_DIRECTORY}/scrap-paper-2.png`),
-    xPercent: 67.1,
-    yPercent: 63.7,
-    widthPercent: 9.2,
+    xPercent: 67.3,
+    yPercent: 63.8,
+    widthPercent: 4.5,
     rotateDeg: 10,
     surface: 'grass',
     modal: {
@@ -127,6 +128,16 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     },
   },
 ];
+
+/**
+ * Цветокоррекция листа: своя из конфига, а если её нет — общая, та же, что у предметов стола.
+ *
+ * @param sheet - Лист-черновик.
+ * @returns Настройки для `groundingToCssVars`.
+ */
+export function getDraftSheetGrounding(sheet: DeskDraftSheet): DeskHubGrounding {
+  return sheet.grounding ?? DEFAULT_DESK_HUB_GROUNDING;
+}
 
 /** URL картинок листов по их id — для предзагрузки. */
 export const DESK_DRAFT_SHEET_SOURCES: Readonly<Record<string, string>> = Object.fromEntries(

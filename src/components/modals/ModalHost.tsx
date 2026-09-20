@@ -1,11 +1,13 @@
 import type { ReactElement } from 'react';
 
+import { STUB_MODAL_CONTENT, STUB_MODAL_IDS } from '../../constants/stubModalContent';
 import type { ModalId } from '../../types';
 import { BookModal } from './BookModal';
 import { CakeVideoModal } from './CakeVideoModal';
 import { DraftsModal } from './DraftsModal';
 import { LetterModal } from './LetterModal';
 import { PlaylistModal } from './PlaylistModal';
+import { StubObjectModal } from './StubObjectModal';
 
 /** Пропсы {@link ModalHost}. */
 export interface ModalHostProps {
@@ -16,9 +18,13 @@ export interface ModalHostProps {
 }
 
 /**
- * Монтирует все пять модалок; открыта не больше одной. Свой экземпляр есть у App
+ * Монтирует модалки предметов; открыта не больше одной. Свой экземпляр есть у App
  * (dev-панель) и у сцены Desk (предметы на столе). Модалки остаются смонтированными
  * и переключаются через `isOpen` — на шаге 2 это позволит анимировать и закрытие.
+ *
+ * Предметы, у которых контента пока нет (пластинки, розы, карандаши, ручка), открывают
+ * общую заглушку {@link StubObjectModal} с текстами из `stubModalContent.ts`.
+ * Модалки листов-черновиков живут отдельно — у каждого листа своё содержимое.
  */
 export function ModalHost({ activeModal, onClose }: ModalHostProps): ReactElement {
   return (
@@ -28,6 +34,14 @@ export function ModalHost({ activeModal, onClose }: ModalHostProps): ReactElemen
       <DraftsModal isOpen={activeModal === 'drafts'} onClose={onClose} />
       <CakeVideoModal isOpen={activeModal === 'cakeVideo'} onClose={onClose} />
       <PlaylistModal isOpen={activeModal === 'playlist'} onClose={onClose} />
+      {STUB_MODAL_IDS.map((modalId) => (
+        <StubObjectModal
+          key={modalId}
+          isOpen={activeModal === modalId}
+          onClose={onClose}
+          content={STUB_MODAL_CONTENT[modalId]}
+        />
+      ))}
     </>
   );
 }

@@ -73,6 +73,8 @@ export const DESK_OBJECT_HOVER_MS = 280;
 export const DESK_OBJECT_WIGGLE_MS = 600;
 /** Поворот тонарма к пластинке и обратно у предмета со стилем `tonearm-swing`. */
 export const DESK_TONEARM_SWING_MS = 350;
+/** Один цикл покачивания стопки пластинок со стилем `stack-sway`. */
+export const DESK_STACK_SWAY_MS = 1400;
 /** Цикл мерцания огня на торте стола при наведении. */
 export const DESK_FLAME_FLICKER_MS = 1000;
 
