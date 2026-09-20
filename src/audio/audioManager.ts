@@ -19,6 +19,10 @@ import { devLog, devWarn } from '../utils/devLog';
 const LOG_SCOPE = 'audio';
 const FULL_VOLUME = 1;
 
+/** Пока играет дорожка из плейлиста, фоновые дорожки сцен приглушаются до тишины. */
+const DUCKED_VOLUME = 0;
+const DUCK_FADE_MS = 400;
+
 interface TrackSettings {
   /** Зациклить дорожку. */
   loop: boolean;
@@ -191,6 +195,122 @@ export function fadeAll(volume: number, durationMs: number): void {
   devLog(LOG_SCOPE, 'fadeAll', { volume, durationMs });
 }
 
+/* ── Дорожки из стопки пластинок ──────────────────────────────────────── */
+
+/**
+ * Дорожки плейлиста живут отдельно от дорожек сцен: их список задаёт автор в
+ * `vinylTracks.ts`, поэтому они не попадают в типизированный `AudioTrackId`. Играют
+ * потоково (html5) и по одной: новая дорожка останавливает предыдущую.
+ */
+const playlistTracks = new Map<string, Howl>();
+
+/** Дорожка плейлиста, которая играет сейчас, и её звук. */
+let playingPlaylist: { src: string; howl: Howl; soundId: number } | null = null;
+
+/** Подписчики на смену играющей дорожки плейлиста (список дорожек в модалке). */
+const playlistListeners = new Set<() => void>();
+
+function notifyPlaylistListeners(): void {
+  for (const listener of playlistListeners) {
+    listener();
+  }
+}
+
+/**
+ * Подписывает на смену играющей дорожки плейлиста: запуск, остановку и конец дорожки.
+ *
+ * @param listener - Вызывается после каждой смены.
+ * @returns Функция отписки.
+ */
+export function subscribePlaylistTrack(listener: () => void): () => void {
+  playlistListeners.add(listener);
+  return () => {
+    playlistListeners.delete(listener);
+  };
+}
+
+function getPlaylistTrack(src: string): Howl {
+  const cached = playlistTracks.get(src);
+  if (cached) {
+    return cached;
+  }
+  const howl = new Howl({
+    src: [src],
+    html5: true,
+    preload: false,
+    onloaderror: (_soundId, error) => {
+      devWarn(LOG_SCOPE, `Не удалось загрузить дорожку плейлиста (${src})`, error);
+    },
+    onplayerror: (soundId, error) => {
+      devWarn(LOG_SCOPE, `Браузер не дал воспроизвести дорожку плейлиста (${src})`, error);
+      howl.once('unlock', () => {
+        howl.play(soundId);
+      });
+    },
+  });
+  playlistTracks.set(src, howl);
+  return howl;
+}
+
+/** Возвращает фоновым дорожкам сцен их громкость после дорожки плейлиста. */
+function unduckScenes(): void {
+  fadeAll(FULL_VOLUME, DUCK_FADE_MS);
+}
+
+/** Дорожка плейлиста, которая играет сейчас, или `null`. */
+export function getPlayingPlaylistTrack(): string | null {
+  return playingPlaylist?.src ?? null;
+}
+
+/** Останавливает дорожку плейлиста и возвращает громкость фоновым дорожкам сцен. */
+export function stopPlaylistTrack(): void {
+  const current = playingPlaylist;
+  if (current === null) {
+    return;
+  }
+  playingPlaylist = null;
+  try {
+    current.howl.stop(current.soundId);
+  } catch (error) {
+    devWarn(LOG_SCOPE, 'Ошибка остановки дорожки плейлиста', error);
+  }
+  unduckScenes();
+  notifyPlaylistListeners();
+  devLog(LOG_SCOPE, `stop плейлист «${current.src}»`);
+}
+
+/**
+ * Включает дорожку плейлиста. Предыдущая останавливается, фоновые дорожки сцен
+ * приглушаются, пока она играет, и возвращаются, когда дорожка кончилась или остановлена.
+ * О смене дорожки узнают подписчики {@link subscribePlaylistTrack}.
+ *
+ * @param src - URL файла дорожки.
+ */
+export function playPlaylistTrack(src: string): void {
+  stopPlaylistTrack();
+  try {
+    const howl = getPlaylistTrack(src);
+    const soundId = howl.play();
+    playingPlaylist = { src, howl, soundId };
+    howl.once(
+      'end',
+      () => {
+        if (playingPlaylist?.soundId === soundId) {
+          playingPlaylist = null;
+          unduckScenes();
+          notifyPlaylistListeners();
+        }
+      },
+      soundId,
+    );
+    fadeAll(DUCKED_VOLUME, DUCK_FADE_MS);
+    notifyPlaylistListeners();
+    devLog(LOG_SCOPE, `play плейлист «${src}»`);
+  } catch (error) {
+    devWarn(LOG_SCOPE, `Ошибка воспроизведения дорожки плейлиста (${src})`, error);
+  }
+}
+
 /** Немедленно останавливает все дорожки. Безопасно вызывать многократно. */
 export function stopAll(): void {
   tracks.forEach((howl, trackId) => {
@@ -199,6 +319,18 @@ export function stopAll(): void {
     });
   });
   activeSounds.clear();
+  const hadPlaylist = playingPlaylist !== null;
+  playingPlaylist = null;
+  playlistTracks.forEach((howl) => {
+    try {
+      howl.stop();
+    } catch (error) {
+      devWarn(LOG_SCOPE, 'Ошибка остановки дорожки плейлиста', error);
+    }
+  });
+  if (hadPlaylist) {
+    notifyPlaylistListeners();
+  }
 }
 
 // HMR (только dev): при горячей замене модуля старые экземпляры Howl не должны продолжать играть.
@@ -209,5 +341,9 @@ if (import.meta.hot) {
       howl.unload();
     });
     tracks.clear();
+    playlistTracks.forEach((howl) => {
+      howl.unload();
+    });
+    playlistTracks.clear();
   });
 }

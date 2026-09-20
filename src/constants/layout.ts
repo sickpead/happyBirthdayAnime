@@ -63,5 +63,7 @@ export const CAKE_LAYOUT = {
 /** Базовое модальное окно, px. */
 export const MODAL_LAYOUT = {
   maxWidth: 560,
+  /** Широкий вариант — для картинок во всю карточку (читалка комикса). */
+  maxWidthWide: 1100,
   closeButtonSize: 40,
 } as const;

@@ -1,0 +1,106 @@
+.reader {
+  display: grid;
+  gap: var(--space-md);
+  justify-items: center;
+}
+
+.stage {
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+
+/*
+ * Рамка страницы: по ней же обрезается приближённая картинка, поэтому скругление и тень
+ * живут здесь. Размер рамка берёт от самой картинки.
+ */
+.frame {
+  display: grid;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  cursor: zoom-in;
+  touch-action: none;
+}
+
+/* Приближённую страницу можно таскать мышью. */
+.frame[data-zoomed='true'] {
+  cursor: grab;
+}
+
+.frame[data-dragging='true'] {
+  cursor: grabbing;
+}
+
+/*
+ * Страницы разного размера и пропорций, поэтому ограничиваем саму картинку: по высоте —
+ * окном, по ширине — карточкой. Ограничение стоит на картинке, а не на её контейнере:
+ * проценты высоты внутри grid-строки резолвятся от содержимого и ничего не ограничивают.
+ * Приближение и сдвиг задаются инлайн через transform.
+ */
+.page {
+  max-width: 100%;
+  max-height: min(70vh, 56rem);
+  opacity: 0;
+  user-select: none;
+}
+
+/* Страница появляется, когда картинка догрузилась, — чтобы не мигать пустым местом. */
+.page[data-loaded='true'] {
+  opacity: 1;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.navButton {
+  composes: accent-icon-button from global;
+  width: var(--modal-close-size);
+  height: var(--modal-close-size);
+  font-size: var(--font-size-xl);
+  line-height: 1;
+}
+
+.navButton:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.counter {
+  min-width: 5rem;
+  color: var(--color-ink-soft);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-ink-soft);
+  text-align: center;
+}
+
+/* Подсказка под страницей: как приблизить, а у приближённой — её масштаб и сброс. */
+.hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-sm);
+}
+
+.resetButton {
+  composes: accent-button from global;
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .page {
+    transition: opacity var(--duration-interaction) ease-out;
+  }
+}

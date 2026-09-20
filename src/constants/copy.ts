@@ -41,6 +41,41 @@ export const DESK_TEXT = {
   missingImage: (filePath: string): string => `Нет файла ${filePath}`,
 } as const;
 
+/** Тексты читалки комикса в модалке «Книга». */
+export const COMIC_TEXT = {
+  /** Доступное имя листалки. */
+  readerLabel: 'Страницы комикса',
+  previousPage: 'Предыдущая страница',
+  nextPage: 'Следующая страница',
+  /** Счётчик страниц под картинкой. */
+  pageCounter: (page: number, total: number): string => `${String(page)} / ${String(total)}`,
+  /** Описание страницы для скринридеров. */
+  pageAlt: (page: number, total: number): string =>
+    `Страница комикса ${String(page)} из ${String(total)}`,
+  /** Подсказка, если страниц ещё нет. */
+  empty: 'Страниц пока нет: положите файлы в public/assets/comic/',
+  /** Подсказка про приближение страницы. */
+  zoomHint: 'Колесо мыши — приблизить страницу',
+  /** Текущий масштаб приближённой страницы. */
+  zoomLevel: (zoom: number): string => `×${zoom.toFixed(1)} · перетащите мышью`,
+  resetZoom: 'Показать целиком',
+} as const;
+
+/** Тексты стопки пластинок: список дорожек в модалке. */
+export const VINYL_TEXT = {
+  /** Доступное имя списка дорожек. */
+  listLabel: 'Дорожки',
+  /** Подсказка над списком. */
+  hint: 'Нажмите на дорожку, чтобы включить её',
+  /** Что делает клик по дорожке — доступное имя кнопки. */
+  play: (title: string): string => `Включить «${title}»`,
+  stop: (title: string): string => `Остановить «${title}»`,
+  /** Пометка играющей дорожки. */
+  nowPlaying: 'играет',
+  /** Подсказка, если дорожек ещё нет. */
+  empty: 'Дорожек пока нет: положите файлы в public/assets/audio/vinyl/',
+} as const;
+
 /** Тексты сцены intro. */
 export const INTRO_TEXT = {
   greeting: 'С Днём Рождения, Арайкош!',

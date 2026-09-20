@@ -147,6 +147,7 @@ export const CSS_VARIABLES = {
   '--cake-height': `min(${String(CAKE_LAYOUT.heightMaxVh)}vh, ${String(CAKE_LAYOUT.heightMaxVw)}vw)`,
 
   '--modal-max-width': px(MODAL_LAYOUT.maxWidth),
+  '--modal-max-width-wide': px(MODAL_LAYOUT.maxWidthWide),
   '--modal-close-size': px(MODAL_LAYOUT.closeButtonSize),
 } as const satisfies Readonly<Record<CssCustomPropertyName, string>>;
 

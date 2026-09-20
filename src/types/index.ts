@@ -1,4 +1,4 @@
-export type { AudioTrackId, FadeInOptions, PlayOnceOptions } from './audio';
+export type { AudioTrackId, FadeInOptions, PlayOnceOptions, VinylTrack } from './audio';
 export type {
   CakeCandlePosition,
   CakeImageId,
@@ -6,6 +6,7 @@ export type {
   CanvasRect,
   CanvasSprite,
 } from './cake';
+export type { ComicPage } from './comic';
 export type {
   AmbientCloudPlacement,
   CloudCurtainState,

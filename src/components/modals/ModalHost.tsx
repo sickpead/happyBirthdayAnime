@@ -8,6 +8,7 @@ import { DraftsModal } from './DraftsModal';
 import { LetterModal } from './LetterModal';
 import { PlaylistModal } from './PlaylistModal';
 import { StubObjectModal } from './StubObjectModal';
+import { VinylStackModal } from './VinylStackModal';
 
 /** Пропсы {@link ModalHost}. */
 export interface ModalHostProps {
@@ -34,6 +35,7 @@ export function ModalHost({ activeModal, onClose }: ModalHostProps): ReactElemen
       <DraftsModal isOpen={activeModal === 'drafts'} onClose={onClose} />
       <CakeVideoModal isOpen={activeModal === 'cakeVideo'} onClose={onClose} />
       <PlaylistModal isOpen={activeModal === 'playlist'} onClose={onClose} />
+      <VinylStackModal isOpen={activeModal === 'vinyl-stack'} onClose={onClose} />
       {STUB_MODAL_IDS.map((modalId) => (
         <StubObjectModal
           key={modalId}

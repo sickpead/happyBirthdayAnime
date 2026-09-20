@@ -10,7 +10,7 @@ const CAKE_DIRECTORY = `${ASSET_DIRECTORIES.images}/cake`;
  * Горит свеча или потушена — решает код: огни и дым лежат отдельными слоями поверх торта.
  */
 export const CAKE_IMAGES: Readonly<Record<CakeImageId, string>> = {
-  cake: assetUrl(`${CAKE_DIRECTORY}/cake-v2.png`),
+  cake: assetUrl(`${CAKE_DIRECTORY}/cake-v3.png`),
   flame: assetUrl(`${CAKE_DIRECTORY}/flame.png`),
   smoke: assetUrl(`${CAKE_DIRECTORY}/smoke.png`),
 };
@@ -21,10 +21,10 @@ export const CAKE_IMAGES: Readonly<Record<CakeImageId, string>> = {
  * от viewport. Все значения измерены по самим PNG.
  */
 
-/** Холст картинки торта `cake-v2.png`, px. */
+/** Холст картинки торта `cake-v3.png`, px. */
 export const CAKE_CANVAS = {
-  width: 1380,
-  height: 752,
+  width: 848,
+  height: 1264,
 } as const;
 
 /** Холст спрайтов огня и дыма (`flame.png`, `smoke.png`), px. */
@@ -34,15 +34,15 @@ export const CAKE_SPRITE_CANVAS = {
 } as const;
 
 /**
- * Видимая область торта на холсте `cake-v2.png`: сам торт (473…1021 × 23…603) и место над
- * свечами под огни — оно выходит выше холста, поэтому `y` отрицательный. Остальное —
- * прозрачные поля; дым поднимается ещё выше, контейнер его не обрезает.
+ * Видимая область торта на холсте `cake-v3.png`: сам торт со свечами (130…754 × 230…1000)
+ * плюс поле сверху под огни и по 10 px с боков и снизу. Остальное — прозрачные поля;
+ * дым поднимается выше огня, контейнер его не обрезает.
  */
 export const CAKE_VIEWBOX: CanvasRect = {
-  x: 463,
-  y: -24,
-  width: 568,
-  height: 637,
+  x: 120,
+  y: 185,
+  width: 645,
+  height: 825,
 };
 
 /** Огонь на `flame.png`: содержимое и середина закруглённого низа пламени, px. */
@@ -57,11 +57,11 @@ export const SMOKE_SPRITE: CanvasSprite = {
   base: { x: 360.5, y: 1039 },
 };
 
-/** Высота огня на холсте торта, px — примерно две ширины свечи (свеча ≈ 19 px). */
-export const FLAME_HEIGHT = 38;
+/** Высота огня на холсте торта, px — примерно две ширины свечи (свеча ≈ 25 px). */
+export const FLAME_HEIGHT = 50;
 
 /** Насколько основание огня ниже кончика фитиля, px: верх фитиля «входит» в пламя. */
-export const FLAME_SINK = 4;
+export const FLAME_SINK = 5;
 
 /** Высота струйки дыма на холсте торта, px. */
-export const SMOKE_HEIGHT = 66;
+export const SMOKE_HEIGHT = 88;

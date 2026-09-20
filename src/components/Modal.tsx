@@ -6,6 +6,7 @@ import { KEYS } from '../constants/keyboard';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useKeyDown } from '../hooks/useKeyDown';
 import type { ModalProps } from '../types';
+import { classNames } from '../utils/classNames';
 import styles from './Modal.module.css';
 
 /**
@@ -18,7 +19,13 @@ import styles from './Modal.module.css';
  * Рендерится порталом в `document.body`, чтобы не зависеть от контекстов наложения сцен.
  * Шаг 2: анимации открытия и закрытия.
  */
-export function Modal({ isOpen, onClose, ariaLabel, children }: ModalProps): ReactElement | null {
+export function Modal({
+  isOpen,
+  onClose,
+  ariaLabel,
+  wide = false,
+  children,
+}: ModalProps): ReactElement | null {
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(dialogRef, isOpen);
@@ -41,7 +48,7 @@ export function Modal({ isOpen, onClose, ariaLabel, children }: ModalProps): Rea
       />
       <div
         ref={dialogRef}
-        className={styles.dialog}
+        className={classNames(styles.dialog, wide && styles.dialogWide)}
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}

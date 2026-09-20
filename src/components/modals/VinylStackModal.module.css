@@ -1,0 +1,85 @@
+.title {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-tight);
+}
+
+.hint {
+  margin: 0 0 var(--space-md);
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-sm);
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-ink-soft);
+  text-align: center;
+}
+
+.list {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Дорожка — кнопка во всю ширину карточки: иконка, название и пометка «играет». */
+.track {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-stone-grey);
+  border-radius: var(--radius-md);
+  background-color: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.track:hover,
+.track:focus-visible {
+  border-color: var(--color-accent-gold);
+  background-color: color-mix(in srgb, var(--color-accent-gold) 18%, transparent);
+}
+
+.track[data-playing='true'] {
+  border-color: var(--color-accent-terracotta);
+  background-color: color-mix(in srgb, var(--color-accent-terracotta) 14%, transparent);
+}
+
+.icon {
+  color: var(--color-accent-terracotta-deep);
+  font-size: var(--font-size-sm);
+}
+
+.titles {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+
+.trackTitle {
+  line-height: var(--line-height-tight);
+}
+
+.artist {
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-sm);
+}
+
+.badge {
+  color: var(--color-accent-terracotta-deep);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .track {
+    transition:
+      border-color var(--duration-interaction) ease,
+      background-color var(--duration-interaction) ease;
+  }
+}

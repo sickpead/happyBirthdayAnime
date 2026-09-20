@@ -7,6 +7,20 @@ export interface PlayOnceOptions {
   volume?: number;
 }
 
+/**
+ * Дорожка из стопки пластинок на столе: свой файл автора, которого нет в `AudioTrackId` —
+ * список дорожек задаётся в `src/constants/vinylTracks.ts`.
+ */
+export interface VinylTrack {
+  id: string;
+  /** Название дорожки в списке. */
+  title: string;
+  /** Исполнитель или подпись под названием. */
+  artist?: string;
+  /** URL файла внутри `public/`. */
+  src: string;
+}
+
 /** Параметры запуска дорожки с плавным нарастанием громкости. */
 export interface FadeInOptions {
   /** Целевая громкость 0–1. По умолчанию 1. */

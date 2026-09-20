@@ -14,7 +14,6 @@ export interface StubModalContent {
  * компонент `StubObjectModal` больше ничего не знает.
  */
 export const STUB_MODAL_CONTENT: Readonly<Record<StubModalId, StubModalContent>> = {
-  'vinyl-stack': { title: 'Пластинки', placeholder: 'Скоро здесь будет...' },
   'rose-vase': { title: 'Розы', placeholder: 'Скоро здесь будет...' },
   'colored-pencils': { title: 'Карандаши', placeholder: 'Скоро здесь будет...' },
   'fountain-pen': { title: 'Ручка', placeholder: 'Скоро здесь будет...' },
@@ -22,7 +21,6 @@ export const STUB_MODAL_CONTENT: Readonly<Record<StubModalId, StubModalContent>>
 
 /** Порядок модалок-заглушек — для рендера и обхода. */
 export const STUB_MODAL_IDS = [
-  'vinyl-stack',
   'rose-vase',
   'colored-pencils',
   'fountain-pen',
