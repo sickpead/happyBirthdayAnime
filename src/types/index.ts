@@ -1,4 +1,10 @@
-export type { AudioTrackId, FadeInOptions, PlayOnceOptions, VinylTrack } from './audio';
+export type {
+  AudioTrackId,
+  FadeInOptions,
+  PlayOnceOptions,
+  PlaylistStatus,
+  VinylTrack,
+} from './audio';
 export type {
   CakeCandlePosition,
   CakeImageId,

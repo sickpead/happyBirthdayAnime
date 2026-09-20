@@ -119,19 +119,22 @@ export const DESK_HUB_OBJECTS: readonly DeskHubObjectLayer[] = [
     widthPercent: 20.2,
     grounding: DEFAULT_DESK_HUB_GROUNDING,
     modalId: 'playlist',
+    // Корпус без тонарма; качается один слой (PNG без двойного рычага).
     hoverStyle: 'tonearm-swing',
     layers: {
       vinylSrc: assetUrl(`${DESK_ASSET_DIRECTORY}/turntable-desk-vinyl.png`),
       tonearmSrc: assetUrl(`${DESK_ASSET_DIRECTORY}/turntable-desk-tonearm.png`),
-      vinyl: { scale: 0.52, offsetXPercent: -6.33, offsetYPercent: -5.16 },
+      // Диск в лунке платтера, центр на шпинделе (подобрано по скрину).
+      vinyl: { scale: 0.625, offsetXPercent: -5, offsetYPercent: -1.5 },
       tonearm: {
-        scale: 0.48,
-        offsetXPercent: -0.99,
-        offsetYPercent: -13.15,
-        pivotXPercent: 73.86,
-        pivotYPercent: 43.36,
-        restRotationDeg: -32,
-        hoverRotationDeg: -8,
+        // Пивот на креплении корпуса; один рычаг, качается при hover.
+        scale: 0.44,
+        offsetXPercent: -1,
+        offsetYPercent: -10,
+        pivotXPercent: 78,
+        pivotYPercent: 32,
+        restRotationDeg: -14,
+        hoverRotationDeg: 10,
       },
     },
   },
@@ -194,7 +197,9 @@ export const DESK_HUB_LAYER_SOURCES: Readonly<Record<string, string>> = Object.f
     ...(object.layers
       ? ([
           [deskHubLayerKey(object.id, 'vinyl'), object.layers.vinylSrc],
-          [deskHubLayerKey(object.id, 'tonearm'), object.layers.tonearmSrc],
+          ...(object.layers.tonearmSrc === undefined
+            ? []
+            : ([[deskHubLayerKey(object.id, 'tonearm'), object.layers.tonearmSrc]] as const)),
         ] as const)
       : []),
     ...(object.imageSrcOpen === undefined

@@ -41,9 +41,13 @@
   height: var(--turntable-vinyl-image-height);
 }
 
-/* Постоянное вращение 33⅓ об/мин (иконка в углу). В intro вращением управляет GSAP. */
+/* Вращение только пока играет трек (`data-spinning="true"`). */
 .vinyl[data-spinning='true'] {
   animation: vinyl-spin var(--duration-vinyl-rotation) linear infinite;
+}
+
+.vinyl[data-spinning='false'] {
+  animation: none;
 }
 
 @keyframes vinyl-spin {

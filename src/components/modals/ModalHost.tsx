@@ -23,8 +23,6 @@ export interface ModalHostProps {
  * (dev-панель) и у сцены Desk (предметы на столе). Модалки остаются смонтированными
  * и переключаются через `isOpen` — на шаге 2 это позволит анимировать и закрытие.
  *
- * Предметы, у которых контента пока нет (пластинки, розы, карандаши, ручка), открывают
- * общую заглушку {@link StubObjectModal} с текстами из `stubModalContent.ts`.
  * Модалки листов-черновиков живут отдельно — у каждого листа своё содержимое.
  */
 export function ModalHost({ activeModal, onClose }: ModalHostProps): ReactElement {

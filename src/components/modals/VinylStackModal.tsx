@@ -2,8 +2,10 @@ import { useSyncExternalStore, type ReactElement } from 'react';
 
 import {
   getPlayingPlaylistTrack,
+  getPlaylistStatus,
+  pausePlaylistTrack,
   playPlaylistTrack,
-  stopPlaylistTrack,
+  resumePlaylistTrack,
   subscribePlaylistTrack,
 } from '../../audio/audioManager';
 import { VINYL_TEXT } from '../../constants/copy';
@@ -15,8 +17,9 @@ import styles from './VinylStackModal.module.css';
 
 /**
  * Модалка стопки пластинок: список дорожек из `src/constants/vinylTracks.ts`.
- * Клик по дорожке включает её, повторный — останавливает; играет не больше одной,
- * фоновая песня сцены на это время приглушается и возвращается, когда дорожка кончилась.
+ * Клик по дорожке включает её, повторный ставит на паузу, ещё раз — продолжает.
+ * Играет не больше одной; фоновая песня сцены на это время приглушается
+ * и возвращается, когда проигрыватель выключают.
  *
  * Дорожка продолжает играть, если модалку закрыть: при следующем открытии список
  * подхватывает её и показывает, что именно звучит.
@@ -25,10 +28,15 @@ export function VinylStackModal({ isOpen, onClose }: ContentModalProps): ReactEl
   // Что играет, знает аудио-менеджер: список подписан на него и не заводит своего состояния,
   // поэтому дорожка, кончившаяся при закрытой модалке, не оставляет ложной пометки.
   const playingSrc = useSyncExternalStore(subscribePlaylistTrack, getPlayingPlaylistTrack);
+  const status = useSyncExternalStore(subscribePlaylistTrack, getPlaylistStatus);
 
   const toggle = (track: VinylTrack): void => {
-    if (playingSrc === track.src) {
-      stopPlaylistTrack();
+    if (playingSrc === track.src && status === 'playing') {
+      pausePlaylistTrack();
+      return;
+    }
+    if (playingSrc === track.src && status === 'paused') {
+      resumePlaylistTrack();
       return;
     }
     playPlaylistTrack(track.src);
@@ -44,15 +52,20 @@ export function VinylStackModal({ isOpen, onClose }: ContentModalProps): ReactEl
           <p className={styles.hint}>{VINYL_TEXT.hint}</p>
           <ul className={styles.list} aria-label={VINYL_TEXT.listLabel}>
             {VINYL_TRACKS.map((track) => {
-              const isPlaying = playingSrc === track.src;
+              const isActive = playingSrc === track.src;
+              const isPlaying = isActive && status === 'playing';
               return (
                 <li key={track.id}>
                   <button
                     type="button"
                     className={styles.track}
-                    data-playing={isPlaying}
+                    data-playing={isActive}
                     aria-label={
-                      isPlaying ? VINYL_TEXT.stop(track.title) : VINYL_TEXT.play(track.title)
+                      isPlaying
+                        ? VINYL_TEXT.pause(track.title)
+                        : isActive
+                          ? VINYL_TEXT.resume(track.title)
+                          : VINYL_TEXT.play(track.title)
                     }
                     aria-pressed={isPlaying}
                     onClick={() => {
@@ -68,7 +81,11 @@ export function VinylStackModal({ isOpen, onClose }: ContentModalProps): ReactEl
                         <span className={styles.artist}>{track.artist}</span>
                       )}
                     </span>
-                    {isPlaying && <span className={styles.badge}>{VINYL_TEXT.nowPlaying}</span>}
+                    {isActive && (
+                      <span className={styles.badge}>
+                        {isPlaying ? VINYL_TEXT.nowPlaying : VINYL_TEXT.nowPaused}
+                      </span>
+                    )}
                   </button>
                 </li>
               );

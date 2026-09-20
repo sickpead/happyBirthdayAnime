@@ -1,14 +1,16 @@
 /*
- * Холст картинок шире самой деки (прозрачные поля), поэтому его размер и отступы
+ * Холст картинок шире самой деки (прозрачные поля), поэтому размер и отступы деки
  * вычислены из границ деки (см. cssVariables.ts): дека стоит ровно в углу, а прозрачные
- * поля могут заходить за край экрана.
+ * поля могут заходить за край экрана. Микшер выезжает под декой только при наведении
+ * или фокусе, чтобы не перекрывать сцену.
  */
 .corner {
   position: fixed;
   top: var(--corner-turntable-top);
   right: var(--corner-turntable-right);
   z-index: var(--z-turntable);
-  width: var(--corner-turntable-width);
+  display: grid;
+  justify-items: end;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -21,14 +23,108 @@
 .corner[data-visible='true'] {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
   transition:
     opacity var(--duration-turntable-fade) ease,
     visibility 0s linear 0s;
 }
 
+.deck {
+  width: var(--corner-turntable-width);
+  pointer-events: auto;
+}
+
+.mixer {
+  position: absolute;
+  top: calc(100% - var(--space-xs));
+  right: 0;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-xs);
+  width: 11.5rem;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background-color: var(--color-panel);
+  box-shadow: var(--shadow-soft);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(calc(-1 * var(--space-xs)));
+  transition:
+    opacity var(--duration-interaction) ease,
+    transform var(--duration-interaction) ease;
+}
+
+.corner[data-visible='true']:hover .mixer,
+.corner[data-visible='true']:focus-within .mixer,
+.corner[data-mixer-open='true'] .mixer {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+
+.nowPlaying {
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-ink);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-tight);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slider {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--color-accent-terracotta);
+  cursor: pointer;
+}
+
+.slider:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.transport {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+}
+
+.navButton,
+.playButton {
+  composes: accent-icon-button from global;
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: var(--font-size-sm);
+  line-height: 1;
+}
+
+.navButton:disabled,
+.playButton:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.volume {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.volumeLabel {
+  color: var(--color-ink-soft);
+  font-size: var(--font-size-sm);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .corner,
-  .corner[data-visible='true'] {
+  .corner[data-visible='true'],
+  .mixer,
+  .corner[data-visible='true']:hover .mixer,
+  .corner[data-visible='true']:focus-within .mixer,
+  .corner[data-mixer-open='true'] .mixer {
     transition: none;
   }
 }

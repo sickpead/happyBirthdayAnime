@@ -66,14 +66,33 @@ export const VINYL_TEXT = {
   /** Доступное имя списка дорожек. */
   listLabel: 'Дорожки',
   /** Подсказка над списком. */
-  hint: 'Нажмите на дорожку, чтобы включить её',
+  hint: 'Нажмите на дорожку, чтобы включить её. Повторно — пауза',
   /** Что делает клик по дорожке — доступное имя кнопки. */
   play: (title: string): string => `Включить «${title}»`,
+  pause: (title: string): string => `Пауза «${title}»`,
+  resume: (title: string): string => `Продолжить «${title}»`,
   stop: (title: string): string => `Остановить «${title}»`,
   /** Пометка играющей дорожки. */
   nowPlaying: 'играет',
+  nowPaused: 'пауза',
   /** Подсказка, если дорожек ещё нет. */
   empty: 'Дорожек пока нет: положите файлы в public/assets/audio/vinyl/',
+} as const;
+
+/** Тексты микшера на проигрывателе стола. */
+export const PLAYER_TEXT = {
+  nowPlaying: 'Сейчас играет',
+  idle: 'Проигрыватель выключен',
+  play: 'Играть',
+  pause: 'Пауза',
+  previous: 'Предыдущая дорожка',
+  next: 'Следующая дорожка',
+  stop: 'Выключить',
+  seek: 'Позиция дорожки',
+  volume: 'Громкость',
+  time: (current: string, total: string): string => `${current} / ${total}`,
+  /** Доступное имя мини-плеера в углу экрана. */
+  cornerLabel: 'Проигрыватель в углу',
 } as const;
 
 /** Тексты сцены intro. */

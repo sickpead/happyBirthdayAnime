@@ -164,6 +164,7 @@ export function createIntroTimeline(
   // f. Игла коснулась пластинки: в этот же момент пластинка начинает вращаться и стартует звук.
   //    Тонарм дальше неподвижен — он не связан с пластинкой.
   timeline.addLabel('needleLanded').call(callbacks.onNeedleLanded, undefined, 'needleLanded');
+  let stopVinylSpin: (() => void) | undefined;
   if (!prefersReducedMotion()) {
     const spin = gsap.to(vinyl, {
       rotation: 360,
@@ -172,6 +173,9 @@ export function createIntroTimeline(
       repeat: -1,
       paused: true,
     });
+    stopVinylSpin = (): void => {
+      spin.pause();
+    };
     // Разгон: скорость вращения плавно растёт от 0 до 33⅓ об/мин.
     timeline
       .call(
@@ -193,10 +197,18 @@ export function createIntroTimeline(
   timeline.call(callbacks.onSongStart, undefined, afterLabel('needleLanded', SONG_START_DELAY_MS));
 
   // h–i. Сцена держится, затем одновременно: звук уходит в фон, облака закрывают экран.
+  //      Пластинка останавливается вместе с уходом песни — крутится только пока идёт трек.
   //      Фейд звука идёт в Howler; пустой твин его длины не даёт таймлайну закончиться раньше.
   timeline
     .addLabel('close', afterLabel('needleLanded', SONG_START_DELAY_MS + SCENE_HOLD_MS))
-    .call(callbacks.onCloseStart, undefined, 'close')
+    .call(
+      () => {
+        stopVinylSpin?.();
+        callbacks.onCloseStart();
+      },
+      undefined,
+      'close',
+    )
     .add(
       createCloudCurtainTimeline(curtain, 'closed', {
         durationMs: CLOUD_CLOSE_DURATION_MS,

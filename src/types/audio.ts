@@ -7,6 +7,9 @@ export interface PlayOnceOptions {
   volume?: number;
 }
 
+/** Состояние дорожки проигрывателя: ничего не выбрано, играет или на паузе. */
+export type PlaylistStatus = 'idle' | 'playing' | 'paused';
+
 /**
  * Дорожка из стопки пластинок на столе: свой файл автора, которого нет в `AudioTrackId` —
  * список дорожек задаётся в `src/constants/vinylTracks.ts`.

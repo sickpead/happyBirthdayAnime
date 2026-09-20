@@ -18,11 +18,9 @@ export interface TurntableArtProps {
 }
 
 /**
- * Проигрыватель из трёх PNG-слоёв на общем холсте фиксированных пропорций:
- * 1. корпус (без пластинки и тонарма);
- * 2. пластинка — обёртка-квадрат вокруг диска, вращается вокруг собственного центра;
- * 3. тонарм — поверх пластинки, внутри pivot-контейнера, чей левый верхний угол стоит
- *    ровно в точке шарнира: поворот pivot (`transform-origin: 0 0`) вращает тонарм вокруг шарнира.
+ * Проигрыватель из PNG-слоёв на общем холсте фиксированных пропорций:
+ * 1. корпус — с уже нарисованным тонармом (отдельный слой давал двойной рычаг);
+ * 2. пластинка — обёртка-квадрат вокруг диска, вращается вокруг собственного центра.
  *
  * Вся геометрия — в процентах от холста (CSS-переменные из `cssVariables.ts`), поэтому
  * проигрыватель масштабируется целиком. Для GSAP слои помечены `data-turntable-*`.
@@ -49,7 +47,7 @@ export function TurntableArt({
         decoding="async"
         draggable={false}
       />
-      <div className={styles.vinyl} data-turntable-vinyl data-spinning={isVinylSpinning}>
+      <div className={styles.vinyl} data-turntable-vinyl data-spinning={isVinylSpinning ? 'true' : 'false'}>
         <img
           className={styles.vinylImage}
           src={TURNTABLE_IMAGES.vinyl}
@@ -58,15 +56,11 @@ export function TurntableArt({
           draggable={false}
         />
       </div>
-      <div className={styles.tonearmPivot} data-turntable-tonearm>
-        <img
-          className={styles.tonearm}
-          src={TURNTABLE_IMAGES.tonearm}
-          alt=""
-          decoding="async"
-          draggable={false}
-        />
-      </div>
+      {/*
+        Тонарм уже нарисован на `player-body.png`. Отдельный слой давал второго
+        «гигантского» тонарма. Pivot оставляем пустым — intro GSAP может на него ссылаться.
+      */}
+      <div className={styles.tonearmPivot} data-turntable-tonearm aria-hidden="true" />
     </div>
   );
 }

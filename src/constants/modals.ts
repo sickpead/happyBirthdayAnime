@@ -19,7 +19,7 @@ export const MODAL_TITLES: Readonly<Record<ModalId, string>> = {
   letter: 'Письмо',
   drafts: 'Черновики',
   cakeVideo: 'Видео с тортом',
-  playlist: 'Плейлист',
+  playlist: 'Проигрыватель',
   'vinyl-stack': 'Пластинки',
   'rose-vase': STUB_MODAL_CONTENT['rose-vase'].title,
   'colored-pencils': STUB_MODAL_CONTENT['colored-pencils'].title,

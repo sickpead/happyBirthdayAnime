@@ -1,5 +1,6 @@
-import { useState, type CSSProperties, type ReactElement } from 'react';
+import { useState, useSyncExternalStore, type CSSProperties, type ReactElement } from 'react';
 
+import { getPlaylistStatus, subscribePlaylistTrack } from '../audio/audioManager';
 import { CAKE_IMAGES, CAKE_SPRITE_CANVAS, FLAME_SPRITE } from '../constants/cakeAssets';
 import { DESK_TEXT } from '../constants/copy';
 import { getDraftSheetGrounding } from '../constants/deskDraftSheets';
@@ -225,6 +226,8 @@ export function DeskHubObjects({
 }: DeskHubObjectsProps): ReactElement {
   const [openDraftId, setOpenDraftId] = useState<string | null>(null);
   const openSheet = sheets.find((sheet) => sheet.id === openDraftId) ?? null;
+  const playlistStatus = useSyncExternalStore(subscribePlaylistTrack, getPlaylistStatus);
+  const isVinylSpinning = playlistStatus === 'playing';
 
   return (
     <div className={styles.layer} role="group" aria-label={DESK_TEXT.objectsLabel}>
@@ -338,33 +341,54 @@ export function DeskHubObjects({
             }}
           >
             <span className={styles.content}>
-              {isPaintedInBackdrop ? (
+              {isPaintedInBackdrop && layers ? (
+                // Корпус/тонарм уже на фоне — рисуем только пластинку в хитбоксе.
+                <span className={styles.composed}>
+                  {isReady(layerImages[deskHubLayerKey(object.id, 'vinyl')]) && (
+                    <span className={styles.vinylLayer} style={layerStyle(layers.vinyl)}>
+                      <img
+                        className={styles.vinylDisc}
+                        src={layers.vinylSrc}
+                        alt=""
+                        decoding="async"
+                        draggable={false}
+                        data-desk-object-layer="vinyl"
+                        data-spinning={isVinylSpinning ? 'true' : 'false'}
+                      />
+                    </span>
+                  )}
+                </span>
+              ) : isPaintedInBackdrop ? (
                 paintedHover
               ) : layers ? (
                 <span className={styles.composed}>
                   {baseImage}
                   {isReady(layerImages[deskHubLayerKey(object.id, 'vinyl')]) && (
-                    <img
-                      className={styles.vinylLayer}
-                      src={layers.vinylSrc}
-                      alt=""
-                      style={layerStyle(layers.vinyl)}
-                      decoding="async"
-                      draggable={false}
-                      data-desk-object-layer="vinyl"
-                    />
+                    <span className={styles.vinylLayer} style={layerStyle(layers.vinyl)}>
+                      <img
+                        className={styles.vinylDisc}
+                        src={layers.vinylSrc}
+                        alt=""
+                        decoding="async"
+                        draggable={false}
+                        data-desk-object-layer="vinyl"
+                        data-spinning={isVinylSpinning ? 'true' : 'false'}
+                      />
+                    </span>
                   )}
-                  {isReady(layerImages[deskHubLayerKey(object.id, 'tonearm')]) && (
-                    <img
-                      className={styles.tonearmLayer}
-                      src={layers.tonearmSrc}
-                      alt=""
-                      style={tonearmStyle(layers.tonearm)}
-                      decoding="async"
-                      draggable={false}
-                      data-desk-object-layer="tonearm"
-                    />
-                  )}
+                  {layers.tonearmSrc !== undefined &&
+                    layers.tonearm !== undefined &&
+                    isReady(layerImages[deskHubLayerKey(object.id, 'tonearm')]) && (
+                      <img
+                        className={styles.tonearmLayer}
+                        src={layers.tonearmSrc}
+                        alt=""
+                        style={tonearmStyle(layers.tonearm)}
+                        decoding="async"
+                        draggable={false}
+                        data-desk-object-layer="tonearm"
+                      />
+                    )}
                   {flames}
                 </span>
               ) : imageSrcOpen === undefined ? (

@@ -99,12 +99,15 @@ export interface DeskHubLayerTransform {
 
 /** Составной предмет из нескольких PNG-слоёв поверх базовой `imageSrc` (сейчас — проигрыватель). */
 export interface DeskHubComposedLayers {
-  /** Картинка пластинки: лежит на платтере и не двигается. */
+  /** Картинка пластинки: лежит на платтере; крутится, пока играет плейлист. */
   vinylSrc: string;
-  /** Картинка тонарма: поворачивается вокруг своей оси при `hoverStyle: 'tonearm-swing'`. */
-  tonearmSrc: string;
+  /**
+   * Картинка тонарма — только если его нет на корпусе. Поворачивается вокруг оси при
+   * `hoverStyle: 'tonearm-swing'`.
+   */
+  tonearmSrc?: string;
   vinyl: DeskHubLayerTransform;
-  tonearm: DeskHubLayerTransform & {
+  tonearm?: DeskHubLayerTransform & {
     /**
      * Точка поворота тонарма, % его собственного слоя (не всего предмета): там, где на
      * картинке тонарма его ось, — основание, которым он стоит на корпусе.
