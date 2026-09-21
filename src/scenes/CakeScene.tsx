@@ -1,31 +1,28 @@
+import '@fontsource/marck-script/index.css';
+
 import { gsap } from 'gsap';
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type ReactElement,
-} from 'react';
+import { useCallback, useId, useLayoutEffect, useRef, useState, type ReactElement } from 'react';
 
 import { CAKE_SELECTORS, createBlowOutTimeline, createFlameFlicker } from '../animation/candles';
+import { CLOUD_CURTAIN_SELECTORS, setCloudCurtainState } from '../animation/cloudCurtain';
 import { BirthdayCake } from '../components/BirthdayCake';
+import { CloudCurtain } from '../components/CloudCurtain';
 import { SkyAmbientBackdrop } from '../components/SkyAmbientBackdrop';
 import { CAKE_CANDLE_POSITIONS } from '../constants/cakeCandles';
 import { CAKE_TEXT, UI_TEXT } from '../constants/copy';
 import { SCENE_LABELS } from '../constants/scenes';
 import type { SceneProps } from '../types';
 import { prefersReducedMotion } from '../utils/motion';
+import { createCakeCloseTimeline } from './cakeTimeline';
 import styles from './CakeScene.module.css';
 
-/** Фаза сцены: свечи горят → их задувают → погашены. */
-type CakePhase = 'lit' | 'blowing' | 'blownOut';
+/** Фаза сцены: свечи горят → их задувают → облака закрывают торт. */
+type CakePhase = 'lit' | 'blowing' | 'closing';
 
 /**
- * Сцена «Cake» — торт с пятью горящими свечами. По кнопке «Задуть свечу» огни гаснут
- * по очереди, из фитилей поднимается дым; после этого появляется кнопка «Далее →».
- * Вступление и тексты сцены — следующим шагом.
+ * Сцена «Cake» — торт с горящими свечами и поздравлением. По кнопке «Задуть свечу»
+ * огни гаснут, из фитилей поднимается дым, затем облака закрывают экран и на них
+ * появляется пожелание — после паузы сцена уходит на стол.
  *
  * Default export — соглашение для модулей сцен: любую из них можно подключить через `React.lazy`.
  */
@@ -36,17 +33,21 @@ export default function CakeScene({ onNext }: SceneProps): ReactElement {
   const flickersRef = useRef<gsap.core.Tween[]>([]);
   // Синхронная защита от двойного клика: состояние обновится только после ререндера.
   const hasBlownOutRef = useRef(false);
-  const nextButtonRef = useRef<HTMLButtonElement>(null);
   const [phase, setPhase] = useState<CakePhase>('lit');
+  const [isCurtainOpen, setCurtainOpen] = useState(true);
 
-  // Огни горят с момента появления сцены. Всё, что создано в GSAP-контексте
-  // (включая задувание по клику), откатывается при уходе со сцены.
+  // Огни горят с момента появления сцены. Шторка стартует открытой: торт виден сразу.
+  // Всё, что создано в GSAP-контексте (включая задувание и закрытие), откатывается при уходе.
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (root === null) {
       return;
     }
     const context = gsap.context(() => {
+      const curtain = root.querySelector(CLOUD_CURTAIN_SELECTORS.root);
+      if (curtain !== null) {
+        setCloudCurtainState(curtain, 'open');
+      }
       if (prefersReducedMotion()) {
         return;
       }
@@ -64,13 +65,6 @@ export default function CakeScene({ onNext }: SceneProps): ReactElement {
     };
   }, []);
 
-  // Свечи погасли: «Далее» заменила «Задуть свечу» — переводим фокус на новую кнопку.
-  useEffect(() => {
-    if (phase === 'blownOut') {
-      nextButtonRef.current?.focus();
-    }
-  }, [phase]);
-
   const handleBlowOut = useCallback(() => {
     const root = rootRef.current;
     const context = animationContextRef.current;
@@ -85,43 +79,46 @@ export default function CakeScene({ onNext }: SceneProps): ReactElement {
         flickers: flickersRef.current,
         reducedMotion: prefersReducedMotion(),
         onComplete: () => {
-          setPhase('blownOut');
+          setPhase('closing');
+          setCurtainOpen(false);
+          createCakeCloseTimeline(root, {
+            reducedMotion: prefersReducedMotion(),
+            onComplete: onNext,
+          });
         },
       });
     });
-  }, []);
+  }, [onNext]);
 
   return (
     <section ref={rootRef} className={styles.scene} aria-labelledby={headingId}>
-      {/* Фон — небо с облаками, постоянно, пока сцена на экране. */}
-      <SkyAmbientBackdrop visible={true} />
-      <h1 id={headingId} className={styles.title}>
-        {UI_TEXT.sceneTitle(SCENE_LABELS.cake)}
+      <SkyAmbientBackdrop visible={isCurtainOpen} />
+      <h1 id={headingId} className={styles.greeting} data-cake-greeting>
+        <span className={styles.greetingLine}>{CAKE_TEXT.greeting}</span>
+        <span className={styles.greetingLine}>{CAKE_TEXT.dedication}</span>
       </h1>
-      <BirthdayCake className={styles.cake} label={CAKE_TEXT.cakeLabel} />
-      <div className={styles.actions}>
-        {phase === 'blownOut' ? (
-          <button
-            key="next"
-            ref={nextButtonRef}
-            type="button"
-            className={styles.button}
-            onClick={onNext}
-          >
-            {UI_TEXT.nextButton}
-          </button>
-        ) : (
-          <button
-            key="blow-out"
-            type="button"
-            className={styles.button}
-            disabled={phase === 'blowing'}
-            onClick={handleBlowOut}
-          >
-            {CAKE_TEXT.blowOut}
-          </button>
-        )}
+      <div className={styles.stage}>
+        <p className={styles.hint} data-cake-hint>
+          {CAKE_TEXT.hint}
+        </p>
+        <BirthdayCake className={styles.cake} label={CAKE_TEXT.cakeLabel} />
       </div>
+      <div className={styles.actions} data-cake-actions>
+        <button
+          type="button"
+          className={styles.button}
+          disabled={phase !== 'lit'}
+          onClick={handleBlowOut}
+        >
+          {CAKE_TEXT.blowOut}
+        </button>
+      </div>
+      <CloudCurtain className={styles.cover}>
+        <p className={styles.wish} data-cake-wish>
+          {CAKE_TEXT.wish}
+        </p>
+      </CloudCurtain>
+      <p className={styles.sceneName}>{UI_TEXT.sceneTitle(SCENE_LABELS.cake)}</p>
     </section>
   );
 }

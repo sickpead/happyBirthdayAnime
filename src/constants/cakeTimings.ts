@@ -57,3 +57,16 @@ export const SMOKE_SCALE_TO = 1.15;
 export const SMOKE_RISE_Y_PERCENT = -25;
 /** Боковой снос каждой струйки, % её ширины (знак — направление). */
 export const SMOKE_DRIFT_X_PERCENT = [-18, 14, -10, 16, -14] as const;
+
+/* ── Закрытие облаков и пожелание ─────────────────────────────────────── */
+
+/** Поздравление и кнопка тают, когда облака съезжаются. */
+export const CAKE_CONTENT_FADE_MS = 600;
+/** Облака съезжаются к центру и закрывают экран. */
+export const CAKE_CLOUD_CLOSE_DURATION_MS = 1500;
+/** Задержка между соседними облаками одной группы при закрытии. */
+export const CAKE_CLOUD_CLOSE_STAGGER_MS = 110;
+/** Пожелание проявляется на уже закрывающихся облаках. */
+export const CAKE_WISH_FADE_IN_MS = 800;
+/** Пауза с пожеланием, прежде чем уйти на стол. */
+export const CAKE_WISH_HOLD_MS = 2800;
