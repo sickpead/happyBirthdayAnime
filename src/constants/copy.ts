@@ -18,8 +18,6 @@ export const UI_TEXT = {
 
 /** Тексты сцены Cake. */
 export const CAKE_TEXT = {
-  greeting: 'Моя особенная и неповторимая Арайкошка',
-  dedication: 'С твоим днем тебя.',
   hint: 'Загадай желания\nи задуй свечи',
   blowOut: 'Задуть свечу',
   wish: 'Надеюсь, оно сбудется.',

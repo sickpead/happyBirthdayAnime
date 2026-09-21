@@ -20,7 +20,7 @@ import styles from './CakeScene.module.css';
 type CakePhase = 'lit' | 'blowing' | 'closing';
 
 /**
- * Сцена «Cake» — торт с горящими свечами и поздравлением. По кнопке «Задуть свечу»
+ * Сцена «Cake» — торт с горящими свечами. По кнопке «Задуть свечу»
  * огни гаснут, из фитилей поднимается дым, затем облака закрывают экран и на них
  * появляется пожелание — после паузы сцена уходит на стол.
  *
@@ -93,9 +93,8 @@ export default function CakeScene({ onNext }: SceneProps): ReactElement {
   return (
     <section ref={rootRef} className={styles.scene} aria-labelledby={headingId}>
       <SkyAmbientBackdrop visible={isCurtainOpen} />
-      <h1 id={headingId} className={styles.greeting} data-cake-greeting>
-        <span className={styles.greetingLine}>{CAKE_TEXT.greeting}</span>
-        <span className={styles.greetingLine}>{CAKE_TEXT.dedication}</span>
+      <h1 id={headingId} className={styles.sceneName}>
+        {UI_TEXT.sceneTitle(SCENE_LABELS.cake)}
       </h1>
       <div className={styles.stage}>
         <p className={styles.hint} data-cake-hint>
@@ -118,7 +117,6 @@ export default function CakeScene({ onNext }: SceneProps): ReactElement {
           {CAKE_TEXT.wish}
         </p>
       </CloudCurtain>
-      <p className={styles.sceneName}>{UI_TEXT.sceneTitle(SCENE_LABELS.cake)}</p>
     </section>
   );
 }

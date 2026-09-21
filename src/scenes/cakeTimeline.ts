@@ -17,7 +17,6 @@ import { msToSeconds } from '../utils/time';
 
 /** Селекторы сцены Cake — контракт между разметкой и таймлайном закрытия. */
 export const CAKE_SCENE_SELECTORS = {
-  greeting: '[data-cake-greeting]',
   hint: '[data-cake-hint]',
   actions: '[data-cake-actions]',
   wish: '[data-cake-wish]',
@@ -44,7 +43,7 @@ const fade = (durationMs: number): gsap.TweenVars => ({
 });
 
 /**
- * После дыма: поздравление и кнопка гаснут, облака закрывают торт, на них проявляется
+ * После дыма: подсказка и кнопка гаснут, облака закрывают торт, на них проявляется
  * пожелание — и сцена держит паузу, чтобы его успели прочитать.
  */
 export function createCakeCloseTimeline(
@@ -52,7 +51,6 @@ export function createCakeCloseTimeline(
   { reducedMotion, onComplete }: CakeCloseOptions,
 ): gsap.core.Timeline {
   const curtain = requireElement(root, CLOUD_CURTAIN_SELECTORS.root);
-  const greeting = requireElement(root, CAKE_SCENE_SELECTORS.greeting);
   const hint = requireElement(root, CAKE_SCENE_SELECTORS.hint);
   const actions = requireElement(root, CAKE_SCENE_SELECTORS.actions);
   const wish = requireElement(root, CAKE_SCENE_SELECTORS.wish);
@@ -60,13 +58,13 @@ export function createCakeCloseTimeline(
 
   if (reducedMotion) {
     setCloudCurtainState(curtain, 'closed');
-    gsap.set([greeting, hint, actions], { autoAlpha: 0 });
+    gsap.set([hint, actions], { autoAlpha: 0 });
     gsap.set(wish, { autoAlpha: 1 });
     return timeline.to({}, { duration: msToSeconds(CAKE_WISH_HOLD_MS) });
   }
 
   return timeline
-    .to([greeting, hint, actions], { autoAlpha: 0, ...fade(CAKE_CONTENT_FADE_MS) }, 0)
+    .to([hint, actions], { autoAlpha: 0, ...fade(CAKE_CONTENT_FADE_MS) }, 0)
     .add(
       createCloudCurtainTimeline(curtain, 'closed', {
         durationMs: CAKE_CLOUD_CLOSE_DURATION_MS,

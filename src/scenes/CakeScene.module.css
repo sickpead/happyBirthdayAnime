@@ -8,33 +8,11 @@
   height: 100%;
   padding: var(--space-xl);
   overflow: hidden;
-  /* Чуть ниже общего торта: над ним ещё поздравление и кнопка. */
-  --cake-height: min(52vh, 68vw);
 }
 
-/* Имя сцены — для скринридеров; визуально сцену держат поздравление и торт. */
+/* Имя сцены — для скринридеров; визуально сцену держат торт и подсказка. */
 .sceneName {
   composes: visually-hidden from global;
-}
-
-.greeting {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-sm);
-  margin: 0;
-  max-width: min(92vw, 52rem);
-  color: var(--color-ink);
-  font-family: var(--font-family-script);
-  font-size: clamp(var(--font-size-xl), 4.4vw, var(--font-size-display));
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-tight);
-  text-align: center;
-  text-shadow: 0 0 var(--space-lg) var(--color-sky-mist);
-}
-
-.greetingLine {
-  display: block;
 }
 
 /* Торт остаётся по центру; подсказка сидит в левой колонке и смотрит на него. */
