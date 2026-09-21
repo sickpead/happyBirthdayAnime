@@ -9,16 +9,17 @@ export const ASSET_DIRECTORIES = {
   comic: 'assets/comic',
 } as const;
 
-/** Все звуковые дорожки приложения (для предзагрузки). */
+/**
+ * Звуки сцен (для предзагрузки). Музыки здесь нет: песня вступления — это первая дорожка
+ * фоновой очереди из `vinylTracks.ts`, её заводит `src/audio/playlist.ts`.
+ */
 export const AUDIO_TRACK_IDS = [
   'needle-drop',
   'crackle',
-  'song',
 ] as const satisfies readonly AudioTrackId[];
 
 /** URL звуковых дорожек (`public/assets/audio`). */
 export const AUDIO_SOURCES: Readonly<Record<AudioTrackId, string>> = {
   'needle-drop': assetUrl(`${ASSET_DIRECTORIES.audio}/needle-drop.mp3`),
   crackle: assetUrl(`${ASSET_DIRECTORIES.audio}/vinyl-crackle.mp3`),
-  song: assetUrl(`${ASSET_DIRECTORIES.audio}/happy-birthday.mp3`),
 };

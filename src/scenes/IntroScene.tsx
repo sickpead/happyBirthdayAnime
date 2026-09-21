@@ -2,13 +2,13 @@ import { gsap } from 'gsap';
 import { useCallback, useLayoutEffect, useRef, useState, type ReactElement } from 'react';
 
 import * as audioManager from '../audio/audioManager';
+import { preloadBackgroundMusic, startBackgroundMusic } from '../audio/playlist';
 import { IntroCloudCover } from '../components/IntroCloudCover';
 import { SkyAmbientBackdrop } from '../components/SkyAmbientBackdrop';
-import { TurntableArt } from '../components/TurntableArt';
+import { VinylPlayer, type VinylPlayerHandle } from '../components/vinylPlayer';
 import { INTRO_TEXT } from '../constants/copy';
 import {
   CLOSE_AUDIO_FADE_MS,
-  CLOSE_AUDIO_TARGET_VOLUME,
   CRACKLE_FADE_IN_MS,
   CRACKLE_TARGET_VOLUME,
   INVITE_PULSE_HALF_CYCLE_MS,
@@ -16,6 +16,7 @@ import {
   INVITE_PULSE_SCALE,
   NEEDLE_DROP_SFX_VOLUME,
   SONG_FADE_IN_MS,
+  SONG_START_VOLUME,
   SONG_TARGET_VOLUME,
 } from '../constants/introTimings';
 import { NEXT_SCENE } from '../constants/scenes';
@@ -28,34 +29,28 @@ import styles from './IntroScene.module.css';
 import { createIntroTimeline, INTRO_SELECTORS } from './introTimeline';
 
 /**
- * Сцена «Intro». Экран закрыт облаками с поздравлением. Клик по приглашению — единственный
- * жест пользователя, он же разблокирует звук — запускает сценарий одним таймлайном GSAP:
- * облака расходятся, проигрыватель появляется из темноты, тонарм поворачивается к пластинке,
- * игла касается её — пластинка начинает вращаться и звучат треск и песня; затем облака
- * закрываются, проигрыватель уезжает в угол, и общий переход ведёт к следующей сцене.
- * Тайминги и громкости — в `src/constants/introTimings.ts`.
- *
- * Default export — соглашение для модулей сцен: любую из них можно подключить через `React.lazy`.
+ * Сцена Intro. Облака / переход — как раньше.
+ * Проигрыватель — новый VinylPlayer: тонарм, диск и Happy Birthday внутри него.
  */
 export default function IntroScene({ onTurntableDocked }: IntroSceneProps): ReactElement {
   const rootRef = useRef<HTMLElement>(null);
+  const playerRef = useRef<VinylPlayerHandle>(null);
   const animationContextRef = useRef<gsap.Context | null>(null);
-  // Синхронная защита от двойного клика: состояние обновится только после ререндера.
   const hasStartedRef = useRef(false);
   const [hasStarted, setHasStarted] = useState(false);
-  // Открыт ли облачный занавес: с клика (облака расходятся) до начала закрытия в финале.
-  // Пока он открыт, на небе позади деки видны мягкие облака.
   const [isCurtainOpen, setCurtainOpen] = useState(false);
+  const [isDeckInFront, setDeckInFront] = useState(false);
   const { transitionToScene } = useSceneTransition();
 
-  // Предзагрузка звука и пульсация приглашения. Всё, что создано в GSAP-контексте
-  // (включая таймлайн сценария, добавленный по клику), откатывается при размонтировании.
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (root === null) {
       return;
     }
     audioManager.preloadAudio();
+    // Песня вступления — первая дорожка фоновой очереди: её файл нужен уже через несколько
+    // секунд, остальные дорожки подгружаются, только когда до них дойдёт очередь.
+    preloadBackgroundMusic();
 
     const context = gsap.context(() => {
       if (!prefersReducedMotion()) {
@@ -89,15 +84,30 @@ export default function IntroScene({ onTurntableDocked }: IntroSceneProps): Reac
 
     context.add(() => {
       createIntroTimeline(root, {
+        onCurtainOpened: () => {
+          setDeckInFront(true);
+        },
+        onStartPlayer: () => {
+          void playerRef.current?.play();
+        },
         onNeedleLanded: () => {
           audioManager.playOnce('needle-drop', { volume: NEEDLE_DROP_SFX_VOLUME });
           audioManager.playCrackle({ volume: CRACKLE_TARGET_VOLUME, fadeInMs: CRACKLE_FADE_IN_MS });
         },
         onSongStart: () => {
-          audioManager.playSong({ volume: SONG_TARGET_VOLUME, fadeInMs: SONG_FADE_IN_MS });
+          // Музыка принадлежит приложению, а не сцене: очередь заводится здесь один раз
+          // и дальше играет сама — вступление её уже не останавливает.
+          startBackgroundMusic({
+            fromVolume: SONG_START_VOLUME,
+            toVolume: SONG_TARGET_VOLUME,
+            fadeMs: SONG_FADE_IN_MS,
+          });
         },
         onCloseStart: () => {
-          audioManager.fadeAll(CLOSE_AUDIO_TARGET_VOLUME, CLOSE_AUDIO_FADE_MS);
+          // Проигрыватель не останавливаем: музыка продолжается, значит и пластинка должна
+          // крутиться — он уезжает в угол играющим и таким же «приземляется» в иконку.
+          // Затихает только виниловый треск, звук самой сцены.
+          audioManager.fadeOutSceneTracks(CLOSE_AUDIO_FADE_MS);
           setCurtainOpen(false);
         },
         onDocked: onTurntableDocked,
@@ -112,10 +122,9 @@ export default function IntroScene({ onTurntableDocked }: IntroSceneProps): Reac
     <section ref={rootRef} className={styles.scene}>
       <SkyAmbientBackdrop visible={isCurtainOpen} />
       <div className={styles.atmosphere} aria-hidden="true" />
-      <div className={styles.stage}>
+      <div className={styles.stage} data-deck-front={isDeckInFront}>
         <div className={styles.deck} data-intro-deck>
-          {/* Вращением пластинки в intro управляет таймлайн GSAP, поэтому CSS-вращение выключено. */}
-          <TurntableArt isVinylSpinning={false} label={INTRO_TEXT.turntableLabel} />
+          <VinylPlayer ref={playerRef} label={INTRO_TEXT.turntableLabel} />
         </div>
       </div>
       <IntroCloudCover className={styles.cover} hasStarted={hasStarted} onStart={handleStart} />

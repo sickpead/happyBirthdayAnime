@@ -11,14 +11,12 @@
 }
 
 /*
- * Рамка страницы: по ней же обрезается приближённая картинка, поэтому скругление и тень
- * живут здесь. Размер рамка берёт от самой картинки.
+ * Рамка страницы: по ней обрезается приближённая картинка.
+ * Размер берёт от самой картинки, без отдельной карточки и тени.
  */
 .frame {
   display: grid;
   overflow: hidden;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-soft);
   cursor: zoom-in;
   touch-action: none;
 }
@@ -71,7 +69,7 @@
 
 .counter {
   min-width: 5rem;
-  color: var(--color-ink-soft);
+  color: var(--color-bg-cream);
   font-family: var(--font-family-mono);
   font-size: var(--font-size-sm);
   text-align: center;
@@ -79,7 +77,7 @@
 
 .empty {
   margin: 0;
-  color: var(--color-ink-soft);
+  color: var(--color-bg-cream);
   text-align: center;
 }
 
@@ -89,7 +87,7 @@
   align-items: center;
   gap: var(--space-sm);
   margin: 0;
-  color: var(--color-ink-soft);
+  color: var(--color-bg-cream);
   font-size: var(--font-size-sm);
 }
 

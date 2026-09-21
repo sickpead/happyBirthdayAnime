@@ -5,6 +5,7 @@ import {
   DESK_OBJECT_WIGGLE_MS,
   DESK_STACK_SWAY_MS,
   DESK_TONEARM_SWING_MS,
+  DESK_VINYL_ROTATION_MS,
 } from '../constants/deskTimings';
 import { VINYL_SPIN_MS_PER_ROTATION } from '../constants/introTimings';
 import {
@@ -119,6 +120,7 @@ export const CSS_VARIABLES = {
   '--duration-desk-object-hover': ms(DESK_OBJECT_HOVER_MS),
   '--duration-desk-object-wiggle': ms(DESK_OBJECT_WIGGLE_MS),
   '--duration-desk-tonearm-swing': ms(DESK_TONEARM_SWING_MS),
+  '--duration-desk-vinyl-rotation': ms(DESK_VINYL_ROTATION_MS),
   '--duration-desk-stack-sway': ms(DESK_STACK_SWAY_MS),
   '--duration-desk-flame-flicker': ms(DESK_FLAME_FLICKER_MS),
 

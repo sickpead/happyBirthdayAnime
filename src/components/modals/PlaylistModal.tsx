@@ -10,7 +10,7 @@ import {
   setPlaylistVolume,
   stopPlaylistTrack,
   togglePlaylistPlayback,
-} from '../../audio/audioManager';
+} from '../../audio/playlist';
 import { PLAYER_TEXT, VINYL_TEXT } from '../../constants/copy';
 import { KEYS } from '../../constants/keyboard';
 import { MODAL_TITLES } from '../../constants/modals';

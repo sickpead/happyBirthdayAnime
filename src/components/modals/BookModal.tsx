@@ -17,7 +17,7 @@ export function BookModal({ isOpen, onClose }: ContentModalProps): ReactElement 
   const [pageIndex, setPageIndex] = useState(0);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} ariaLabel={MODAL_TITLES.book} wide>
+    <Modal isOpen={isOpen} onClose={onClose} ariaLabel={MODAL_TITLES.book} wide frameless>
       <ComicReader pages={COMIC_PAGES} pageIndex={pageIndex} onPageChange={setPageIndex} />
     </Modal>
   );

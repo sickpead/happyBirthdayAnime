@@ -20,10 +20,23 @@ export interface StubObjectModalProps extends ContentModalProps {
  * `src/constants/stubModalContent.ts`, код трогать не нужно.
  */
 export function StubObjectModal({ isOpen, onClose, content }: StubObjectModalProps): ReactElement {
+  const hasImage = content.imageSrc !== undefined;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} ariaLabel={content.title}>
-      <h2 className={styles.title}>{content.title}</h2>
-      <p className={styles.placeholder}>{content.placeholder}</p>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={content.title}
+      frameless={hasImage}
+    >
+      {hasImage ? (
+        <img className={styles.image} src={content.imageSrc} alt="" decoding="async" />
+      ) : (
+        <>
+          <h2 className={styles.title}>{content.title}</h2>
+          <p className={styles.placeholder}>{content.placeholder}</p>
+        </>
+      )}
     </Modal>
   );
 }

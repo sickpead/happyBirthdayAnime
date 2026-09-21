@@ -33,6 +33,7 @@ export type {
   DeskHubLayerTransform,
   DeskHubObjectId,
   DeskHubObjectLayer,
+  DeskHubVinylPlacement,
   DeskStageId,
   DeskStageZoom,
   DeskTransitionType,

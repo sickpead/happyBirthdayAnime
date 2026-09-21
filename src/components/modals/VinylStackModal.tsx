@@ -7,7 +7,7 @@ import {
   playPlaylistTrack,
   resumePlaylistTrack,
   subscribePlaylistTrack,
-} from '../../audio/audioManager';
+} from '../../audio/playlist';
 import { VINYL_TEXT } from '../../constants/copy';
 import { MODAL_TITLES } from '../../constants/modals';
 import { VINYL_TRACKS } from '../../constants/vinylTracks';
@@ -18,11 +18,12 @@ import styles from './VinylStackModal.module.css';
 /**
  * Модалка стопки пластинок: список дорожек из `src/constants/vinylTracks.ts`.
  * Клик по дорожке включает её, повторный ставит на паузу, ещё раз — продолжает.
- * Играет не больше одной; фоновая песня сцены на это время приглушается
- * и возвращается, когда проигрыватель выключают.
+ * Играет не больше одной: выбранная дорожка сменяет ту, что шла фоном, и звучит громче,
+ * а когда кончится — фоновая очередь сама продолжится со следующей.
  *
- * Дорожка продолжает играть, если модалку закрыть: при следующем открытии список
- * подхватывает её и показывает, что именно звучит.
+ * Дорожка продолжает играть, если модалку закрыть: список подписан на очередь
+ * (`useSyncExternalStore`), поэтому при следующем открытии показывает, что звучит сейчас,
+ * даже если дорожку включила сама очередь.
  */
 export function VinylStackModal({ isOpen, onClose }: ContentModalProps): ReactElement {
   // Что играет, знает аудио-менеджер: список подписан на него и не заводит своего состояния,

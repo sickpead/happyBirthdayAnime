@@ -1,6 +1,6 @@
 import { useState, useSyncExternalStore, type CSSProperties, type ReactElement } from 'react';
 
-import { getPlaylistStatus, subscribePlaylistTrack } from '../audio/audioManager';
+import { getPlaylistStatus, subscribePlaylistTrack } from '../audio/playlist';
 import { CAKE_IMAGES, CAKE_SPRITE_CANVAS, FLAME_SPRITE } from '../constants/cakeAssets';
 import { DESK_TEXT } from '../constants/copy';
 import { getDraftSheetGrounding } from '../constants/deskDraftSheets';
@@ -17,6 +17,7 @@ import type {
   DeskHubLayerTransform,
   DeskHubObjectId,
   DeskHubObjectLayer,
+  DeskHubVinylPlacement,
   ModalId,
 } from '../types';
 import { classNames } from '../utils/classNames';
@@ -49,6 +50,11 @@ type LayerStyle = CSSProperties &
   Record<'--layer-scale' | '--layer-offset-x' | '--layer-offset-y', string>;
 type TonearmLayerStyle = LayerStyle &
   Record<'--tonearm-pivot' | '--tonearm-rest-deg' | '--tonearm-hover-deg', string>;
+type VinylLayerStyle = CSSProperties &
+  Record<
+    '--vinyl-center-x' | '--vinyl-center-y' | '--vinyl-diameter' | '--vinyl-tilt' | '--vinyl-persp',
+    string
+  >;
 type RevealStyle = CSSProperties &
   Record<'--reveal-width' | '--reveal-height' | '--reveal-offset-x' | '--reveal-offset-y', string>;
 type FlameStyle = CSSProperties & Record<'--flame-delay' | '--flame-aspect', string>;
@@ -66,8 +72,28 @@ function layerStyle({ scale, offsetXPercent, offsetYPercent }: DeskHubLayerTrans
   };
 }
 
-/** Слой тонарма: сдвиг, масштаб, ось и оба угла поворота. */
-function tonearmStyle(tonearm: DeskHubComposedLayers['tonearm']): TonearmLayerStyle {
+/**
+ * Слой пластинки: круг нужного диаметра в нужной точке корпуса плюс наклон и перспектива —
+ * CSS-переменные для `DeskHubObjects.module.css`. Сама картинка плоская, вид строго сверху.
+ */
+function vinylStyle({
+  centerXPercent,
+  centerYPercent,
+  diameterPercent,
+  tiltDeg,
+  perspectivePx,
+}: DeskHubVinylPlacement): VinylLayerStyle {
+  return {
+    '--vinyl-center-x': percent(centerXPercent),
+    '--vinyl-center-y': percent(centerYPercent),
+    '--vinyl-diameter': percent(diameterPercent),
+    '--vinyl-tilt': deg(tiltDeg),
+    '--vinyl-persp': `${String(perspectivePx)}px`,
+  };
+}
+
+/** Слой тонарма: сдвиг, масштаб, ось и оба угла поворота. Только если тонарм отдельным слоем. */
+function tonearmStyle(tonearm: NonNullable<DeskHubComposedLayers['tonearm']>): TonearmLayerStyle {
   return {
     ...layerStyle(tonearm),
     '--tonearm-pivot': `${percent(tonearm.pivotXPercent)} ${percent(tonearm.pivotYPercent)}`,
@@ -345,7 +371,11 @@ export function DeskHubObjects({
                 // Корпус/тонарм уже на фоне — рисуем только пластинку в хитбоксе.
                 <span className={styles.composed}>
                   {isReady(layerImages[deskHubLayerKey(object.id, 'vinyl')]) && (
-                    <span className={styles.vinylLayer} style={layerStyle(layers.vinyl)}>
+                    <span
+                      className={styles.vinylLayer}
+                      style={vinylStyle(layers.vinyl)}
+                      data-desk-vinyl={object.id}
+                    >
                       <img
                         className={styles.vinylDisc}
                         src={layers.vinylSrc}
@@ -364,7 +394,11 @@ export function DeskHubObjects({
                 <span className={styles.composed}>
                   {baseImage}
                   {isReady(layerImages[deskHubLayerKey(object.id, 'vinyl')]) && (
-                    <span className={styles.vinylLayer} style={layerStyle(layers.vinyl)}>
+                    <span
+                      className={styles.vinylLayer}
+                      style={vinylStyle(layers.vinyl)}
+                      data-desk-vinyl={object.id}
+                    >
                       <img
                         className={styles.vinylDisc}
                         src={layers.vinylSrc}

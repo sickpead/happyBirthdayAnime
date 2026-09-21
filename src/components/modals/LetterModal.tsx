@@ -3,16 +3,25 @@ import type { ReactElement } from 'react';
 import { MODAL_TITLES } from '../../constants/modals';
 import type { ContentModalProps } from '../../types';
 import { Modal } from '../Modal';
-import { ModalPlaceholder } from './ModalPlaceholder';
+import styles from './LetterModal.module.css';
+
+const LETTER_VIDEO_EMBED_SRC = 'https://www.youtube.com/embed/BlA36njayhE';
 
 /**
- * Модалка «Письмо». Шаг 2: текст поздравительного письма.
- * Шаг 1: текст-заглушка внутри базового {@link Modal}.
+ * Модалка «Письмо»: ролик с YouTube.
  */
 export function LetterModal({ isOpen, onClose }: ContentModalProps): ReactElement {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} ariaLabel={MODAL_TITLES.letter}>
-      <ModalPlaceholder title={MODAL_TITLES.letter} />
+    <Modal isOpen={isOpen} onClose={onClose} ariaLabel={MODAL_TITLES.letter} wide frameless>
+      <div className={styles.player}>
+        <iframe
+          className={styles.iframe}
+          src={isOpen ? LETTER_VIDEO_EMBED_SRC : undefined}
+          title={MODAL_TITLES.letter}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
+      </div>
     </Modal>
   );
 }

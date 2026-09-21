@@ -20,6 +20,8 @@ export interface ModalProps {
   ariaLabel: string;
   /** Широкая карточка — для содержимого во всю ширину, например страниц комикса. */
   wide?: boolean;
+  /** Без кремовой карточки: картинка на затемнении, без рамки. */
+  frameless?: boolean;
   /** Содержимое карточки. */
   children: ReactNode;
 }

@@ -1,5 +1,5 @@
 /** Идентификатор звуковой дорожки, которой управляет `audioManager`. */
-export type AudioTrackId = 'needle-drop' | 'crackle' | 'song';
+export type AudioTrackId = 'needle-drop' | 'crackle';
 
 /** Параметры однократного воспроизведения короткого звука. */
 export interface PlayOnceOptions {

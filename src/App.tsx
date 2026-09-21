@@ -1,11 +1,13 @@
-import { lazy, Suspense, useCallback, useState, type ReactElement } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState, type ReactElement } from 'react';
 
 import styles from './App.module.css';
+import { setBackgroundMusicVolume } from './audio/playlist';
 import { CornerTurntable } from './components/CornerTurntable';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ModalHost } from './components/modals/ModalHost';
 import { SceneLoader, SceneLoadError } from './components/SceneFallback';
 import { SceneTransitionClouds } from './components/SceneTransitionClouds';
+import { BACKGROUND_MUSIC_FADE_MS, BACKGROUND_MUSIC_VOLUME } from './constants/audioMix';
 import { INITIAL_SCENE } from './constants/scenes';
 import { useModalManager } from './hooks/useModalManager';
 import { SceneTransitionContext } from './hooks/useSceneTransition';
@@ -62,6 +64,14 @@ export function App(): ReactElement {
   const { activeModal, openModal, closeModal } = useModalManager();
 
   useStopAudioOnUnmount();
+
+  // Музыка идёт с вступления и не прерывается. На столе она уходит на фоновую громкость:
+  // там уже не слушают песню, а разглядывают предметы.
+  useEffect(() => {
+    if (scene === 'desk') {
+      setBackgroundMusicVolume(BACKGROUND_MUSIC_VOLUME, BACKGROUND_MUSIC_FADE_MS);
+    }
+  }, [scene]);
 
   const changeScene = useCallback((next: SceneName) => {
     setScene(next);

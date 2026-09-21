@@ -6,7 +6,7 @@ import {
   getPlaylistStatus,
   getPlaylistVolume,
   subscribePlaylistTrack,
-} from '../audio/audioManager';
+} from '../audio/playlist';
 import { VINYL_TRACKS } from '../constants/vinylTracks';
 import type { PlaylistStatus, VinylTrack } from '../types';
 

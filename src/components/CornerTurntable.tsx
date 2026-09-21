@@ -7,12 +7,12 @@ import {
   setPlaylistVolume,
   stopPlaylistTrack,
   togglePlaylistPlayback,
-} from '../audio/audioManager';
+} from '../audio/playlist';
 import { PLAYER_TEXT } from '../constants/copy';
 import { VINYL_TRACKS } from '../constants/vinylTracks';
 import { usePlaylistMixer } from '../hooks/usePlaylistMixer';
+import { VinylPlayer } from './vinylPlayer';
 import styles from './CornerTurntable.module.css';
-import { TurntableArt } from './TurntableArt';
 
 /** Пропсы {@link CornerTurntable}. */
 export interface CornerTurntableProps {
@@ -55,7 +55,12 @@ export function CornerTurntable({ visible }: CornerTurntableProps): ReactElement
       }}
     >
       <div className={styles.deck} data-corner-turntable>
-        <TurntableArt isVinylSpinning={visible && isPlaying} />
+        {/*
+          Иконка встаёт в рабочее положение, пока ещё скрыта: к моменту, когда проигрыватель
+          из intro «приземлится» в неё, тонарм уже на пластинке, а диск крутится — поэтому
+          при передаче ничего не дёргается и не встаёт.
+        */}
+        <VinylPlayer externalPlaying={isPlaying} />
       </div>
 
       {visible && (

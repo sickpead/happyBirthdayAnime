@@ -1,4 +1,6 @@
 import type { StubModalId } from '../types';
+import { assetUrl } from '../utils/assetUrl';
+import { DESK_ASSET_DIRECTORY } from './deskZoomStages';
 
 /** Заголовок и текст-обещание модалки-заглушки. */
 export interface StubModalContent {
@@ -6,6 +8,8 @@ export interface StubModalContent {
   title: string;
   /** Приглушённая строка вместо содержимого, пока его нет. */
   placeholder: string;
+  /** Картинка внутри модалки; если нет — показывается `placeholder`. */
+  imageSrc?: string;
 }
 
 /**
@@ -14,9 +18,21 @@ export interface StubModalContent {
  * компонент `StubObjectModal` больше ничего не знает.
  */
 export const STUB_MODAL_CONTENT: Readonly<Record<StubModalId, StubModalContent>> = {
-  'rose-vase': { title: 'Розы', placeholder: 'Скоро здесь будет...' },
-  'colored-pencils': { title: 'Карандаши', placeholder: 'Скоро здесь будет...' },
-  'fountain-pen': { title: 'Ручка', placeholder: 'Скоро здесь будет...' },
+  'rose-vase': {
+    title: 'Розы',
+    placeholder: 'Скоро здесь будет...',
+    imageSrc: assetUrl(`${DESK_ASSET_DIRECTORY}/rose-vase-card.jpg`),
+  },
+  'colored-pencils': {
+    title: 'Карандаши',
+    placeholder: 'Скоро здесь будет...',
+    imageSrc: assetUrl(`${DESK_ASSET_DIRECTORY}/colored-pencils-comic.jpg`),
+  },
+  'fountain-pen': {
+    title: 'Ручка',
+    placeholder: 'Скоро здесь будет...',
+    imageSrc: assetUrl(`${DESK_ASSET_DIRECTORY}/fountain-pen-letter.jpg`),
+  },
 };
 
 /** Порядок модалок-заглушек — для рендера и обхода. */

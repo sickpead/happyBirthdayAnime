@@ -2,6 +2,7 @@ import type { DeskDraftSheet, DeskHubGrounding } from '../types';
 import { assetUrl } from '../utils/assetUrl';
 import { DEFAULT_DESK_HUB_GROUNDING } from '../utils/deskGrounding';
 import { DESK_DECOR_DIRECTORY } from './deskHubDecor';
+import { DESK_ASSET_DIRECTORY } from './deskZoomStages';
 
 /**
  * Листы-черновики стадии HUB: смятые бумажки, развёрнутая карта истории и стопка чистых
@@ -33,8 +34,7 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     surface: 'table',
     modal: {
       title: 'Черновик №1',
-      images: [],
-      caption: 'Скоро здесь будет первый набросок.',
+      images: [assetUrl(`${DESK_ASSET_DIRECTORY}/draft-1.jpg`)],
     },
   },
   {
@@ -48,8 +48,7 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     surface: 'table',
     modal: {
       title: 'Черновик №2',
-      images: [],
-      caption: 'Скоро здесь будет карта истории.',
+      images: [assetUrl(`${DESK_ASSET_DIRECTORY}/draft-2.jpg`)],
     },
   },
   {
@@ -63,8 +62,15 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     surface: 'table',
     modal: {
       title: 'Черновик №3',
-      images: [],
-      caption: 'Скоро здесь будет стопка неудачных страниц.',
+      images: [
+        assetUrl(`${DESK_ASSET_DIRECTORY}/draft-3/01.jpg`),
+        assetUrl(`${DESK_ASSET_DIRECTORY}/draft-3/02.jpg`),
+        assetUrl(`${DESK_ASSET_DIRECTORY}/draft-3/03.jpg`),
+        assetUrl(`${DESK_ASSET_DIRECTORY}/draft-3/04.jpg`),
+        assetUrl(`${DESK_ASSET_DIRECTORY}/draft-3/05.jpg`),
+        assetUrl(`${DESK_ASSET_DIRECTORY}/draft-3/06.jpg`),
+        assetUrl(`${DESK_ASSET_DIRECTORY}/draft-3/07.jpg`),
+      ],
     },
   },
   {
@@ -78,8 +84,7 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     surface: 'grass',
     modal: {
       title: 'Черновик №4',
-      images: [],
-      caption: 'Скоро здесь будет смятая попытка.',
+      images: [assetUrl(`${DESK_ASSET_DIRECTORY}/draft-4.jpg`)],
     },
   },
   {
@@ -93,8 +98,7 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     surface: 'grass',
     modal: {
       title: 'Черновик №5',
-      images: [],
-      caption: 'Скоро здесь будет зачёркнутая страница.',
+      images: [assetUrl(`${DESK_ASSET_DIRECTORY}/draft-5.jpg`)],
     },
   },
   {
@@ -108,8 +112,7 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     surface: 'grass',
     modal: {
       title: 'Черновик №6',
-      images: [],
-      caption: 'Скоро здесь будет выброшенный лист.',
+      images: [assetUrl(`${DESK_ASSET_DIRECTORY}/draft-6.jpg`)],
     },
   },
   {
@@ -123,8 +126,7 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
     surface: 'grass',
     modal: {
       title: 'Черновик №7',
-      images: [],
-      caption: 'Скоро здесь будет последняя попытка.',
+      images: [assetUrl(`${DESK_ASSET_DIRECTORY}/draft-7.jpg`)],
     },
   },
 ];

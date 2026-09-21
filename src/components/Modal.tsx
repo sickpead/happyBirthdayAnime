@@ -24,6 +24,7 @@ export function Modal({
   onClose,
   ariaLabel,
   wide = false,
+  frameless = false,
   children,
 }: ModalProps): ReactElement | null {
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -48,7 +49,11 @@ export function Modal({
       />
       <div
         ref={dialogRef}
-        className={classNames(styles.dialog, wide && styles.dialogWide)}
+        className={classNames(
+          styles.dialog,
+          wide && styles.dialogWide,
+          frameless && styles.dialogFrameless,
+        )}
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}

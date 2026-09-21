@@ -1,5 +1,6 @@
 import type { CloudTransitionTimings, DarkFadeTimings } from '../types';
 import { SCENE_TRANSITION_TIMINGS } from './timings';
+import { VINYL_SPIN_MS } from './vinylPlayerGeometry';
 
 /**
  * Тайминги сцены Desk, мс. Зум каждой стадии (пауза и длительность) задаётся в её записи
@@ -73,6 +74,11 @@ export const DESK_OBJECT_HOVER_MS = 280;
 export const DESK_OBJECT_WIGGLE_MS = 600;
 /** Поворот тонарма к пластинке и обратно у предмета со стилем `tonearm-swing`. */
 export const DESK_TONEARM_SWING_MS = 350;
+/**
+ * Один оборот пластинки на столе: 33⅓ об/мин — та же скорость, что и у проигрывателя
+ * во вступлении, поэтому берётся из его геометрии, а не задаётся числом заново.
+ */
+export const DESK_VINYL_ROTATION_MS = VINYL_SPIN_MS;
 /** Один цикл покачивания стопки пластинок со стилем `stack-sway`. */
 export const DESK_STACK_SWAY_MS = 1400;
 /** Цикл мерцания огня на торте стола при наведении. */
