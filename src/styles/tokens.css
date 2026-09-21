@@ -95,9 +95,21 @@
   /*
    * Предметы на столе в сцене Desk: при наведении и фокусе предмет обводит тёплое золотое
    * свечение, как будто его вот-вот возьмут в руки (значение для filter). Тень под предметом
-   * рисуется отдельным слоем по настройкам из `src/utils/deskGrounding.ts`.
+   * рисуется отдельным слоем по настройкам из `src/constants/deskObjectShadows.ts`.
+   * Цвет тени — не чёрный: тёплый коричнево-серый на дереве, с зеленью на траве.
    */
   --desk-object-glow: drop-shadow(
     0 0 14px color-mix(in srgb, var(--color-accent-gold) 45%, transparent)
+  );
+  --desk-shadow-table: color-mix(
+    in srgb,
+    var(--color-accent-terracotta-deep) 62%,
+    var(--color-ink)
+  );
+  --desk-shadow-grass: color-mix(in srgb, var(--color-accent-sage-deep) 78%, var(--color-ink));
+  --desk-shadow-chair: color-mix(
+    in srgb,
+    var(--color-accent-terracotta-deep) 48%,
+    var(--color-ink)
   );
 }

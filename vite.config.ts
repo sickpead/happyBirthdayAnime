@@ -14,5 +14,10 @@ export default defineConfig({
   // другим dev-сервером) всё равно уходил бы на 5173, и адрес превью не открывался.
   server: {
     port: devPort,
+    // Windows иногда отдаёт EBUSY на watch отдельных JPEG в public/ — статику не следим,
+    // она и так отдаётся как есть, без HMR.
+    watch: {
+      ignored: ['**/public/assets/**'],
+    },
   },
 });

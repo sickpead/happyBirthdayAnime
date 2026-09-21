@@ -5,6 +5,8 @@ import { CAKE_IMAGES, CAKE_SPRITE_CANVAS, FLAME_SPRITE } from '../constants/cake
 import { DESK_TEXT } from '../constants/copy';
 import { getDraftSheetGrounding } from '../constants/deskDraftSheets';
 import { deskHubLayerKey } from '../constants/deskHubObjects';
+import { getDeskDraftShadows, getDeskHubObjectShadows } from '../constants/deskObjectShadows';
+import { deskLayerBox, deskShadowClip, type DeskShadowClip } from '../constants/deskSurfaces';
 import type { PreloadedImage } from '../hooks/usePreloadedImages';
 import type {
   CakeCandlePosition,
@@ -18,6 +20,8 @@ import type {
   DeskHubObjectId,
   DeskHubObjectLayer,
   DeskHubVinylPlacement,
+  DeskObjectShadowPlan,
+  DeskSilhouetteShadow,
   ModalId,
 } from '../types';
 import { classNames } from '../utils/classNames';
@@ -59,6 +63,16 @@ type RevealStyle = CSSProperties &
   Record<'--reveal-width' | '--reveal-height' | '--reveal-offset-x' | '--reveal-offset-y', string>;
 type FlameStyle = CSSProperties & Record<'--flame-delay' | '--flame-aspect', string>;
 type DecorStyle = CSSProperties;
+type ShadowLayerStyle = CSSProperties &
+  Record<
+    | '--shadow-ox'
+    | '--shadow-oy'
+    | '--shadow-blur'
+    | '--shadow-opacity'
+    | '--shadow-sx'
+    | '--shadow-sy',
+    string
+  >;
 
 const percent = (value: number): string => `${String(value)}%`;
 const deg = (value: number): string => `${String(value)}deg`;
@@ -123,6 +137,77 @@ function canvasInFrame(
 }
 
 const FLAME_IMAGE_STYLE = canvasInFrame(FLAME_SPRITE.box, CAKE_SPRITE_CANVAS);
+
+/**
+ * Силуэтная тень: сдвиг только влево-вниз. Свет справа-сверху, как тень стола на траве.
+ */
+function shadowLayerStyle(layer: DeskSilhouetteShadow): ShadowLayerStyle {
+  return {
+    '--shadow-ox': percent(-Math.abs(layer.offsetXPercent)),
+    '--shadow-oy': percent(Math.abs(layer.offsetYPercent)),
+    '--shadow-blur': `${String(layer.blurPx)}px`,
+    '--shadow-opacity': String(layer.opacity),
+    '--shadow-sx': String(layer.scaleX ?? 1),
+    '--shadow-sy': String(layer.scaleY ?? 1),
+  };
+}
+
+/** Два слоя под предметом: падающая, затем контакт — обе копией той же PNG. */
+function ObjectShadows({
+  plan,
+  imageSrc,
+  clip,
+  clipId,
+}: {
+  plan: DeskObjectShadowPlan;
+  imageSrc: string;
+  clip: DeskShadowClip | null;
+  clipId: string;
+}): ReactElement | null {
+  if (plan.contact === undefined || plan.cast === undefined) {
+    return null;
+  }
+
+  const clipStyle =
+    clip === null
+      ? undefined
+      : { clipPath: clip.kind === 'polygon' ? clip.value : `url(#${clipId})` };
+
+  return (
+    <span
+      className={styles.shadowClip}
+      data-shadow-surface={plan.surface}
+      style={clipStyle}
+      aria-hidden
+    >
+      {clip?.kind === 'path' && (
+        <svg className={styles.shadowClipSvg} aria-hidden>
+          <clipPath id={clipId} clipPathUnits="objectBoundingBox">
+            <path d={clip.value} clipRule="evenodd" />
+          </clipPath>
+        </svg>
+      )}
+      <span className={styles.shadows}>
+        <img
+          className={classNames(styles.shadowSilhouette, styles.cast)}
+          src={imageSrc}
+          alt=""
+          style={shadowLayerStyle(plan.cast)}
+          decoding="async"
+          draggable={false}
+        />
+        <img
+          className={classNames(styles.shadowSilhouette, styles.contact)}
+          src={imageSrc}
+          alt=""
+          style={shadowLayerStyle(plan.contact)}
+          decoding="async"
+          draggable={false}
+        />
+      </span>
+    </span>
+  );
+}
 
 function revealStyle(reveal: DeskHubHoverReveal): RevealStyle {
   return {
@@ -225,9 +310,10 @@ function flameStyle(candle: CakeCandlePosition): FlameStyle {
  * Нарисованный на фоне предмет сам не двигается — двигается только оверлей (открытая
  * картинка или огни).
  *
- * Кнопка предмета — два уровня: сама кнопка стоит на месте (позиция, клик, фокус и тень),
- * а вложенный `content` держит картинку и все её слои. Наклон покоя и движение при наведении
- * живут на `content`, поэтому тень не поворачивается вместе с предметом и не уезжает за ним.
+ * Кнопка предмета — три уровня: `shadows` (контакт и падающая тень на поверхности),
+ * затем `content` с картинкой. Наклон покоя общий, чтобы тень лежала под силуэтом.
+ * При подъёме картинка уезжает вверх, а тени остаются на столе: контакт слабеет,
+ * падающая чуть отделяется влево-вниз.
  *
  * Порядок наложения: декор слоя `below` → листы-черновики → кнопки предметов → декор слоя
  * `above`; предмет с `zIndexOverride` встаёт поверх соседей независимо от этого порядка.
@@ -258,8 +344,21 @@ export function DeskHubObjects({
   return (
     <div className={styles.layer} role="group" aria-label={DESK_TEXT.objectsLabel}>
       <DeskHubDecorLayerImages decor={decor} images={decorImages} layer="below" />
-      {sheets.map((sheet) =>
-        isReady(sheetImages[sheet.id]) ? (
+      {sheets.map((sheet) => {
+        const sheetImage = sheetImages[sheet.id];
+        if (sheetImage?.status !== 'ready') {
+          return null;
+        }
+        const sheetPlan = getDeskDraftShadows(sheet);
+        const sheetBox = deskLayerBox({
+          xPercent: sheet.xPercent,
+          yPercent: sheet.yPercent,
+          widthPercent: sheet.widthPercent,
+          imageWidth: sheetImage.width,
+          imageHeight: sheetImage.height,
+          origin: 'center',
+        });
+        return (
           <button
             key={sheet.id}
             type="button"
@@ -273,6 +372,12 @@ export function DeskHubObjects({
               setOpenDraftId(sheet.id);
             }}
           >
+            <ObjectShadows
+              plan={sheetPlan}
+              imageSrc={sheet.imageSrc}
+              clipId={`desk-shadow-${sheet.id}`}
+              clip={sheetBox === null ? null : deskShadowClip(sheetPlan.surface, sheetBox)}
+            />
             <span className={styles.content}>
               <img
                 className={styles.image}
@@ -283,8 +388,8 @@ export function DeskHubObjects({
               />
             </span>
           </button>
-        ) : null,
-      )}
+        );
+      })}
       {objects.map((object) => {
         const image = images[object.id];
         const isPaintedInBackdrop = object.paintedInBackdrop === true;
@@ -352,6 +457,16 @@ export function DeskHubObjects({
           ) : (
             flames
           );
+        const objectPlan = getDeskHubObjectShadows(object.id);
+        const objectBox = deskLayerBox({
+          xPercent: object.xPercent,
+          yPercent: object.yPercent,
+          widthPercent: object.widthPercent,
+          heightPercent: object.heightPercent,
+          imageWidth: image.status === 'ready' ? image.width : undefined,
+          imageHeight: image.status === 'ready' ? image.height : undefined,
+          origin: 'top-left',
+        });
         return (
           <button
             key={object.id}
@@ -366,6 +481,12 @@ export function DeskHubObjects({
               onSelect(object.modalId);
             }}
           >
+            <ObjectShadows
+              plan={objectPlan}
+              imageSrc={object.imageSrc}
+              clipId={`desk-shadow-${object.id}`}
+              clip={objectBox === null ? null : deskShadowClip(objectPlan.surface, objectBox)}
+            />
             <span className={styles.content}>
               {isPaintedInBackdrop && layers ? (
                 // Корпус/тонарм уже на фоне — рисуем только пластинку в хитбоксе.

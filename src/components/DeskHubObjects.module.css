@@ -8,8 +8,7 @@
 /*
  * Декор: картинки для атмосферы. Координаты в конфиге — центр предмета, поэтому картинка
  * сдвигается на половину себя; наклон задаётся инлайн (rotate). Клики и наведение проходят
- * насквозь — реагируют только кнопки предметов. Тени у декора нет: он плоский, в отличие
- * от кликабельных предметов.
+ * насквозь — реагируют только кнопки предметов. Сейчас массив декора пуст.
  */
 .decor {
   position: absolute;
@@ -21,16 +20,17 @@
 }
 
 /*
- * Предмет — кнопка без собственного фона: видна только картинка. Тени под предметами нет:
- * свет уже нарисован на самих картинках. Кнопка только стоит на месте — она держит клик,
- * фокус и позицию, а наклон и движение при наведении живут на `.content`.
+ * Предмет — кнопка без собственного фона: видна картинка и её тени. Кнопка стоит на месте
+ * (клик, фокус, позиция); наклон покоя общий у теней и картинки; подъём живёт на `.content`.
  */
 .object {
   /* Цветокоррекция картинок предмета — одной строкой, чтобы добавлять к ней свечение. */
   --grounding-color: hue-rotate(var(--grounding-hue, 0deg))
     saturate(var(--grounding-saturate, 100%)) brightness(var(--grounding-brightness, 100%));
+  --desk-shadow-color: var(--desk-shadow-table);
 
   position: absolute;
+  overflow: visible;
   padding: 0;
   border: 0;
   border-radius: var(--radius-md);
@@ -40,8 +40,79 @@
 }
 
 /*
+ * Обрезка тени по поверхности кадра (стол / газон / сиденье). Сама обрезка не крутится —
+ * иначе повёрнутая ручка утащила бы маску стола. Наклон силуэта живёт на `.shadows`.
+ */
+.shadowClip {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.shadowClipSvg {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/*
+ * Тени на поверхности: под картинкой, в том же наклоне покоя. При подъёме предмета
+ * остаются на столе — слабеют и чуть отходят влево-вниз. Свет — сверху-справа.
+ */
+.shadows {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  transform: rotate(var(--rest-rotation-deg, 0deg));
+}
+
+.object[data-surface='grass'] .shadowClip,
+.shadowClip[data-shadow-surface='grass'] {
+  --desk-shadow-color: var(--desk-shadow-grass);
+}
+
+.shadowClip[data-shadow-surface='chair'] {
+  --desk-shadow-color: var(--desk-shadow-chair);
+}
+
+/*
+ * Силуэт той же PNG: непрозрачные пиксели красятся в тёплый коричневый и сдвигаются
+ * влево-вниз. Так тень повторяет форму предмета и не прячется под ним целиком.
+ */
+.shadowSilhouette {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  opacity: var(--shadow-opacity);
+  filter: brightness(0) sepia(0.7) saturate(3.2) hue-rotate(-18deg) blur(var(--shadow-blur));
+  transform: translate(var(--shadow-ox), var(--shadow-oy)) scale(var(--shadow-sx), var(--shadow-sy));
+  transform-origin: 50% 100%;
+}
+
+.contact {
+  z-index: 2;
+}
+
+.cast {
+  z-index: 1;
+}
+
+.shadowClip[data-shadow-surface='grass'] .shadowSilhouette {
+  filter: brightness(0) sepia(0.45) saturate(2.4) hue-rotate(48deg) blur(var(--shadow-blur));
+}
+
+/*
  * Видимая часть предмета: картинка и её слои. Она наклоняется в покое
- * (--rest-rotation-deg из конфига) и двигается при наведении, а кнопка остаётся на месте.
+ * (--rest-rotation-deg из конфига) и двигается при наведении, а тени остаются на поверхности.
  */
 .content {
   position: relative;
@@ -264,6 +335,37 @@
 
   .content {
     transition: transform var(--duration-desk-object-hover) ease-out;
+  }
+
+  .shadowSilhouette {
+    transition:
+      opacity var(--duration-desk-object-hover) ease-out,
+      filter var(--duration-desk-object-hover) ease-out,
+      transform var(--duration-desk-object-hover) ease-out;
+  }
+
+  /*
+   * Предмет приподняли: контакт слабеет, падающая чуть отделяется влево-вниз.
+   * Проигрыватель и торт с поверхности не встают — их тени не трогаем.
+   */
+  .object:hover .contact,
+  .object:focus-visible .contact {
+    opacity: calc(var(--shadow-opacity) * 0.38);
+  }
+
+  .object:hover .cast,
+  .object:focus-visible .cast {
+    opacity: calc(var(--shadow-opacity) * 0.7);
+    transform: translate(calc(var(--shadow-ox) - 3%), calc(var(--shadow-oy) + 2.5%))
+      scale(var(--shadow-sx), var(--shadow-sy));
+  }
+
+  .object[data-hover-style='tonearm-swing']:hover .shadowSilhouette,
+  .object[data-hover-style='tonearm-swing']:focus-visible .shadowSilhouette,
+  .object[data-hover-style='light-candles']:hover .shadowSilhouette,
+  .object[data-hover-style='light-candles']:focus-visible .shadowSilhouette {
+    opacity: var(--shadow-opacity);
+    transform: translate(var(--shadow-ox), var(--shadow-oy)) scale(var(--shadow-sx), var(--shadow-sy));
   }
 
   /* Свечение силуэта — тем же темпом, что и подъём предмета. */

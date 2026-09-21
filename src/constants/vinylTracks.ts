@@ -258,6 +258,12 @@ export const VINYL_TRACKS: readonly VinylTrack[] = [
     ),
   },
   {
+    id: 'the-neighbourhood-reflections',
+    title: 'Reflections',
+    artist: 'The Neighbourhood',
+    src: assetUrl(`${VINYL_TRACK_DIRECTORY}/The%20Neighbourhood%20-%20Reflections.mp3`),
+  },
+  {
     id: 'the-neighbourhood-sweater-weather',
     title: 'Sweater Weather',
     artist: 'The Neighbourhood',

@@ -158,7 +158,7 @@ export type DeskHubObjectId =
  * Цветокоррекция картинки предмета — чтобы он не выглядел наклейкой поверх фона, а попадал
  * в тёплый закатный свет сцены. Значения по умолчанию — в `src/utils/deskGrounding.ts`.
  *
- * Тени под предметами нет: свет уже нарисован на самих картинках.
+ * Контактные и падающие тени — отдельный слой, см. `src/constants/deskObjectShadows.ts`.
  */
 export interface DeskHubGrounding {
   /** Поворот оттенка картинки, градусы (по умолчанию 0). */
@@ -167,6 +167,41 @@ export interface DeskHubGrounding {
   saturatePercent?: number;
   /** Яркость картинки, % (по умолчанию 100). */
   brightnessPercent?: number;
+}
+
+/**
+ * Куда падает тень предмета. Цвет разный: на столешнице — тёплый коричнево-серый,
+ * на траве — с зелёным подмесом, на стуле — как на дереве, но мягче.
+ */
+export type DeskShadowSurface = 'table' | 'grass' | 'chair';
+
+/**
+ * Одна силуэтная тень: та же PNG, сдвинутая влево-вниз. Свет сцены — сверху-справа,
+ * поэтому `offsetXPercent` только отрицательный, `offsetYPercent` — вниз.
+ */
+export interface DeskSilhouetteShadow {
+  /** Сдвиг по X. Только ≤ 0: ни одна тень не уходит вправо. */
+  offsetXPercent: number;
+  /** Сдвиг по Y. Только ≥ 0: вниз, как тень стола на траве. */
+  offsetYPercent: number;
+  /** Размытие силуэта, px. */
+  blurPx: number;
+  /** Непрозрачность, 0…1. */
+  opacity: number;
+  /** Растяжение по ширине (1 — как предмет). */
+  scaleX?: number;
+  /** Растяжение по высоте (1 — как предмет). */
+  scaleY?: number;
+}
+
+/**
+ * Два слоя под предметом: плотный контакт у основания и мягкая падающая влево-вниз.
+ * Рисуются копией той же PNG, поэтому тень повторяет форму предмета, а не общий овал.
+ */
+export interface DeskObjectShadowPlan {
+  surface: DeskShadowSurface;
+  contact: DeskSilhouetteShadow;
+  cast: DeskSilhouetteShadow;
 }
 
 /**
