@@ -70,6 +70,7 @@ export const DESK_DRAFT_SHEETS: readonly DeskDraftSheet[] = [
         assetUrl(`${DESK_ASSET_DIRECTORY}/draft-3/05.jpg`),
         assetUrl(`${DESK_ASSET_DIRECTORY}/draft-3/06.jpg`),
         assetUrl(`${DESK_ASSET_DIRECTORY}/draft-3/07.jpg`),
+        assetUrl(`${DESK_ASSET_DIRECTORY}/draft-3/08.jpg`),
       ],
     },
   },
