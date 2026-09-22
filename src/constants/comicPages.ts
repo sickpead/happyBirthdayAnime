@@ -86,6 +86,7 @@ const PAGE_FILES = [
   '72.jpg',
   '73.jpg',
   '74.jpg',
+  '75.jpg',
   '76.jpg',
   '77.jpg',
   '78.jpg',
@@ -95,12 +96,16 @@ const PAGE_FILES = [
   '82.jpg',
   '83.jpg',
   '84.jpg',
-  '85.jpeg',
-  '86.jpeg',
-  '87.png',
-  '88.jpeg',
+  '85.jpg',
+  '86.jpg',
+  '87.jpg',
+  '88.jpg',
   '89.jpeg',
   '90.jpeg',
+  '91.png',
+  '92.jpeg',
+  '93.jpeg',
+  '94.jpeg',
 ] as const;
 
 /** Страницы комикса по порядку чтения. */

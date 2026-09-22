@@ -163,11 +163,7 @@ function ObjectShadows({
   imageSrc: string;
   clip: DeskShadowClip | null;
   clipId: string;
-}): ReactElement | null {
-  if (plan.contact === undefined || plan.cast === undefined) {
-    return null;
-  }
-
+}): ReactElement {
   const clipStyle =
     clip === null
       ? undefined
@@ -542,6 +538,7 @@ export function DeskHubObjects({
                         decoding="async"
                         draggable={false}
                         data-desk-object-layer="tonearm"
+                        data-playing={isVinylSpinning ? 'true' : 'false'}
                       />
                     )}
                   {flames}

@@ -4,7 +4,6 @@ import { DEFAULT_DESK_HUB_GROUNDING } from '../utils/deskGrounding';
 import { CAKE_IMAGES } from './cakeAssets';
 import { DESK_DECOR_DIRECTORY } from './deskHubDecor';
 import { DESK_ASSET_DIRECTORY } from './deskZoomStages';
-import { TURNTABLE_IMAGES } from './turntableAssets';
 
 /**
  * Предметы на столе стадии HUB: каждый — своя PNG поверх пустого стола
@@ -127,24 +126,28 @@ export const DESK_HUB_OBJECTS: readonly DeskHubObjectLayer[] = [
       // поэтому он вращается вокруг своей оси. Старая перспективная картинка
       // `turntable-desk-vinyl.png` осталась в папке, но больше не используется.
       vinylSrc: assetUrl(`${DESK_ASSET_DIRECTORY}/turntable-desk-vinyl-flat.png`),
-      tonearmSrc: TURNTABLE_IMAGES.tonearm,
+      // У стола свой тонарм: он длиннее и крупнее того, что во вступлении.
+      tonearmSrc: assetUrl(`${DESK_ASSET_DIRECTORY}/turntable-desk-tonearm.png`),
       // Замеры сняты по картинке корпуса (1408×768) и проверены на живом превью.
       vinyl: {
-        centerXPercent: 43.1,
-        centerYPercent: 44.5,
-        diameterPercent: 43,
+        centerXPercent: 43.5,
+        centerYPercent: 41.5,
+        diameterPercent: 47,
         tiltDeg: 61,
         perspectivePx: 1200,
       },
       tonearm: {
-        // Тонарм Intro (холст 1408×768) на перспективном корпусе стола.
-        scale: 0.62,
-        offsetXPercent: 1,
-        offsetYPercent: -5,
-        pivotXPercent: 71.7,
-        pivotYPercent: 30.8,
-        restRotationDeg: -14,
-        hoverRotationDeg: 0,
+        // Холст тот же, 1408×768: ось тонарма нарисована в точке (1015; 255), игла —
+        // в (288; 585). Масштаб подобран так, чтобы игла доставала до края пластинки,
+        // сдвиг ставит ось на брасовую площадку корпуса, а углы отсчитываются от того,
+        // как рычаг нарисован: −26.8° выводит иглу на пластинку, ещё −14° паркуют его.
+        scale: 0.38,
+        offsetXPercent: 0.2,
+        offsetYPercent: -3.2,
+        pivotXPercent: 72.1,
+        pivotYPercent: 33.2,
+        restRotationDeg: -29.6,
+        hoverRotationDeg: -15.6,
       },
     },
   },
