@@ -22,6 +22,11 @@
 /*
  * Предмет — кнопка без собственного фона: видна картинка и её тени. Кнопка стоит на месте
  * (клик, фокус, позиция); наклон покоя общий у теней и картинки; подъём живёт на `.content`.
+ *
+ * Важно: сама кнопка не должна создавать свой контекст наложения — ни z-index, ни transform,
+ * ни translate, ни filter. Иначе тень внутри неё «умножится» не на стол, а на прозрачную
+ * пустоту и станет цветным пятном. Поэтому поднимается только `.content` (см. ниже),
+ * а листы центруются через left/top, а не через translate.
  */
 .object {
   /* Цветокоррекция картинок предмета — одной строкой, чтобы добавлять к ней свечение. */
@@ -42,12 +47,17 @@
 /*
  * Обрезка тени по поверхности кадра (стол / газон / сиденье). Сама обрезка не крутится —
  * иначе повёрнутая ручка утащила бы маску стола. Наклон силуэта живёт на `.shadows`.
+ *
+ * Слои тени внутри смешиваются обычным образом, а вся группа ложится на картинку стола
+ * умножением: тень затемняет поверхность и оставляет видимыми волокна дерева и травинки —
+ * как настоящая тень, а не полупрозрачная плёнка поверх.
  */
 .shadowClip {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  mix-blend-mode: multiply;
 }
 
 .shadowClipSvg {
@@ -79,23 +89,88 @@
 }
 
 /*
- * Силуэт той же PNG: непрозрачные пиксели красятся в тёплый коричневый и сдвигаются
- * влево-вниз. Так тень повторяет форму предмета и не прячется под ним целиком.
+ * Слой силуэтной тени: размытие и прозрачность — здесь, на обёртке, а маска — у вложенного
+ * силуэта. Порядок важен: filter элемента выполняется раньше его маски, поэтому размытие
+ * у самого силуэта размыло бы только однотонную заливку, а край маски остался бы резким.
+ * `--shadow-lift-*` — добавка к сдвигу, когда предмет приподняли наведением; силуэт
+ * получает её по наследству.
  */
-.shadowSilhouette {
+.shadowLayer {
   position: absolute;
   inset: 0;
   z-index: 0;
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
   pointer-events: none;
-  user-select: none;
   opacity: var(--shadow-opacity);
-  filter: brightness(0) sepia(0.7) saturate(3.2) hue-rotate(-18deg) blur(var(--shadow-blur));
-  transform: translate(var(--shadow-ox), var(--shadow-oy)) scale(var(--shadow-sx), var(--shadow-sy));
-  transform-origin: 50% 100%;
+  filter: blur(var(--shadow-blur));
+}
+
+/* Общее у силуэтов: форма — альфа-канал той же PNG (URL инлайн), заливка — цвет поверхности. */
+.shadowSilhouette,
+.shadowLying {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-color: var(--desk-shadow-color);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  /*
+   * Маска бывает из двух слоёв — силуэт и градиент затухания (задаются инлайн): тень берёт
+   * их пересечение, то есть форму предмета, которая плавно гаснет к дальнему концу.
+   */
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/*
+ * Силуэт плоского предмета или «коробки»: преобразования идут от основания (середина нижнего
+ * края) — прижать, вытянуть влево и сдвинуть, см. `deskObjectShadows.ts`.
+ */
+.shadowSilhouette {
+  transform: translate(
+      calc(var(--shadow-ox) + var(--shadow-lift-x, 0%)),
+      calc(var(--shadow-oy) + var(--shadow-lift-y, 0%))
+    )
+    skewX(var(--shadow-skew, 0deg)) scale(var(--shadow-sx), var(--shadow-sy));
+  /* Основание предмета: низ картинки или линия из плана, если под предметом пустое поле. */
+  transform-origin: 50% var(--shadow-base, 100%);
+}
+
+/*
+ * Тень предмета на круглом основании, лежащая на столе: силуэт, повёрнутый вокруг центра
+ * основания верхом влево, укороченный и сплющенный ракурсом стола. Её ближний конец
+ * прячется за предметом.
+ */
+.shadowLying {
+  transform: translate(var(--shadow-lift-x, 0%), var(--shadow-lift-y, 0%))
+    rotate(var(--lie-angle)) scale(var(--lie-depth), var(--lie-length));
+  transform-origin: var(--lie-x) var(--lie-y);
+}
+
+/*
+ * Пятно-отпечаток под предметом на круглом основании (торт, ваза): мягкий эллипс
+ * с центром внутри основания. Большая часть пятна прячется за предметом, а видна его
+ * кромка вокруг дна — так нижний край предмета утоплен в тень и он не «летает».
+ */
+.shadowSpot {
+  position: absolute;
+  left: var(--spot-x);
+  top: var(--spot-y);
+  z-index: 0;
+  display: block;
+  width: var(--spot-w);
+  height: var(--spot-h);
+  border-radius: 50%;
+  pointer-events: none;
+  background-color: var(--desk-shadow-color);
+  opacity: var(--shadow-opacity);
+  filter: blur(var(--shadow-blur));
+  translate: -50% -50%;
+  transform: translate(var(--shadow-lift-x, 0%), var(--shadow-lift-y, 0%));
 }
 
 .contact {
@@ -106,17 +181,14 @@
   z-index: 1;
 }
 
-.shadowClip[data-shadow-surface='grass'] .shadowSilhouette {
-  filter: brightness(0) sepia(0.45) saturate(2.4) hue-rotate(48deg) blur(var(--shadow-blur));
-}
-
 /*
  * Видимая часть предмета: картинка и её слои. Она наклоняется в покое
  * (--rest-rotation-deg из конфига) и двигается при наведении, а тени остаются на поверхности.
  */
 .content {
   position: relative;
-  z-index: 1;
+  /* Порядок наложения предметов — здесь, а не на кнопке (см. `.object`). */
+  z-index: var(--content-z, 1);
   display: block;
   width: 100%;
   transform-origin: 50% 100%;
@@ -134,11 +206,12 @@
 
 /*
  * Тёплое свечение по силуэту — и при prefers-reduced-motion. Приподнятый предмет встаёт
- * поверх соседей, даже если по порядку в конфиге лежит под ними.
+ * поверх соседей, даже если по порядку в конфиге лежит под ними. Поднимается только его
+ * картинка: z-index на самой кнопке изолировал бы наложение тени.
  */
-.object:hover,
-.object:focus-visible {
-  z-index: 1;
+.object:hover .content,
+.object:focus-visible .content {
+  z-index: calc(var(--content-z, 1) + 1);
 }
 
 .object:hover .image,
@@ -155,11 +228,17 @@
 }
 
 /*
- * Лист-черновик: та же кнопка, что и у предмета, но координаты в конфиге — центр листа,
- * поэтому он сдвигается на половину себя.
+ * Лист-черновик: та же кнопка, что и у предмета, но координаты в конфиге — центр листа.
+ * Центруем через left/top, а не через translate: translate создал бы у кнопки свой контекст
+ * наложения, и тень листа перестала бы умножаться на стол. Высота листа в процентах кадра —
+ * ширина × пропорции кадра × пропорции картинки (`--sheet-ratio` = высота / ширина).
  */
 .sheet {
-  translate: -50% -50%;
+  left: calc(var(--sheet-x) - var(--sheet-w) / 2);
+  top: calc(
+    var(--sheet-y) - var(--sheet-w) * var(--frame-aspect-ratio) * var(--sheet-ratio) / 2
+  );
+  width: var(--sheet-w);
 }
 
 .image {
@@ -346,11 +425,17 @@
     transition: transform var(--duration-desk-object-hover) ease-out;
   }
 
-  .shadowSilhouette {
+  .shadowLayer,
+  .shadowSpot {
     transition:
       opacity var(--duration-desk-object-hover) ease-out,
       filter var(--duration-desk-object-hover) ease-out,
       transform var(--duration-desk-object-hover) ease-out;
+  }
+
+  .shadowSilhouette,
+  .shadowLying {
+    transition: transform var(--duration-desk-object-hover) ease-out;
   }
 
   /*
@@ -364,17 +449,20 @@
 
   .object:hover .cast,
   .object:focus-visible .cast {
+    --shadow-lift-x: -3%;
+    --shadow-lift-y: 2.5%;
+
     opacity: calc(var(--shadow-opacity) * 0.7);
-    transform: translate(calc(var(--shadow-ox) - 3%), calc(var(--shadow-oy) + 2.5%))
-      scale(var(--shadow-sx), var(--shadow-sy));
   }
 
-  .object[data-hover-style='tonearm-swing']:hover .shadowSilhouette,
-  .object[data-hover-style='tonearm-swing']:focus-visible .shadowSilhouette,
-  .object[data-hover-style='light-candles']:hover .shadowSilhouette,
-  .object[data-hover-style='light-candles']:focus-visible .shadowSilhouette {
+  .object[data-hover-style='tonearm-swing']:hover :is(.shadowLayer, .shadowSpot),
+  .object[data-hover-style='tonearm-swing']:focus-visible :is(.shadowLayer, .shadowSpot),
+  .object[data-hover-style='light-candles']:hover :is(.shadowLayer, .shadowSpot),
+  .object[data-hover-style='light-candles']:focus-visible :is(.shadowLayer, .shadowSpot) {
+    --shadow-lift-x: 0%;
+    --shadow-lift-y: 0%;
+
     opacity: var(--shadow-opacity);
-    transform: translate(var(--shadow-ox), var(--shadow-oy)) scale(var(--shadow-sx), var(--shadow-sy));
   }
 
   /* Свечение силуэта — тем же темпом, что и подъём предмета. */

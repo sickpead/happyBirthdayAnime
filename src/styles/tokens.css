@@ -101,15 +101,24 @@
   --desk-object-glow: drop-shadow(
     0 0 14px color-mix(in srgb, var(--color-accent-gold) 45%, transparent)
   );
-  --desk-shadow-table: color-mix(
+  /*
+   * Тени предметов стола накладываются умножением (mix-blend-mode: multiply): они не
+   * закрашивают поверхность, а затемняют её, поэтому волокна дерева и травинки видны сквозь
+   * тень, как на референсе. Поэтому цвета здесь светлые — это «во сколько раз темнее»,
+   * а не цвет пятна. На дереве тень холоднее света (по замеру референса синий канал гаснет
+   * меньше всех) — отсюда приглушённый сиреневато-серый; на траве — оливково-серый.
+   */
+  /*
+   * Цвет подобран по замеру: в ядре тени на референсе дерево темнеет примерно ×0,65,
+   * у самого края — ×0,45, а синий канал гаснет меньше красного и зелёного.
+   */
+  --desk-shadow-cool: color-mix(in srgb, var(--color-accent-dustyrose), var(--color-sky-deep));
+  --desk-shadow-table: color-mix(in srgb, var(--desk-shadow-cool) 75%, var(--color-sky-deep));
+  --desk-shadow-grass: color-mix(
     in srgb,
-    var(--color-accent-terracotta-deep) 62%,
-    var(--color-ink)
+    var(--color-stone-grey) 35%,
+    var(--color-accent-sage-deep)
   );
-  --desk-shadow-grass: color-mix(in srgb, var(--color-accent-sage-deep) 78%, var(--color-ink));
-  --desk-shadow-chair: color-mix(
-    in srgb,
-    var(--color-accent-terracotta-deep) 48%,
-    var(--color-ink)
-  );
+  /* Сиденье стула — то же дерево, что и стол. */
+  --desk-shadow-chair: var(--desk-shadow-table);
 }

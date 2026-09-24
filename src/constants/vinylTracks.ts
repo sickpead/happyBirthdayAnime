@@ -278,6 +278,12 @@ export const VINYL_TRACKS: readonly VinylTrack[] = [
     ),
   },
   {
+    id: 'tom-odell-another-love',
+    title: 'Another Love',
+    artist: 'Tom Odell',
+    src: assetUrl(`${VINYL_TRACK_DIRECTORY}/Tom%20Odell%20-%20Another%20Love.mp3`),
+  },
+  {
     id: 'toni-mот-просто-сложно-2023',
     title: 'Просто-сложно (2023)',
     artist: 'Toni, Mот',
@@ -307,6 +313,14 @@ export const VINYL_TRACKS: readonly VinylTrack[] = [
     artist: 'Дос-Мұқасан',
     src: assetUrl(
       `${VINYL_TRACK_DIRECTORY}/%D0%94%D0%BE%D1%81-%D0%9C%D2%B1%D2%9B%D0%B0%D1%81%D0%B0%D0%BD%20-%20%D0%A1%D0%B0%D2%93%D1%8B%D0%BD%D0%B4%D1%8B%D0%BC%20%D1%81%D0%B5%D0%BD%D1%96.mp3`,
+    ),
+  },
+  {
+    id: 'жасұлан-көпберген-жалғыз-жұлдыз',
+    title: 'Жалғыз жұлдыз',
+    artist: 'Жасұлан Көпберген',
+    src: assetUrl(
+      `${VINYL_TRACK_DIRECTORY}/%D0%96%D0%B0%D1%81%D2%B1%D0%BB%D0%B0%D0%BD%20%D0%9A%D3%A9%D0%BF%D0%B1%D0%B5%D1%80%D0%B3%D0%B5%D0%BD%20-%20%D0%96%D0%B0%D0%BB%D2%93%D1%8B%D0%B7%20%D0%B6%D2%B1%D0%BB%D0%B4%D1%8B%D0%B7%20(__%D0%98%D0%B7%20%D0%9A%20_%20%D0%A4%20_%D2%92%D0%B0%D1%88%D1%8B%D2%9B%D0%BF%D1%8B%D0%BD%20%D0%A1%D0%B0%D2%93%D0%B0%D0%BD_).mp3`,
     ),
   },
   {

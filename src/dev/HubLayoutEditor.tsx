@@ -89,24 +89,40 @@ function itemId(element: HTMLElement): string {
   return element.dataset.deskObject ?? element.dataset.deskDecor ?? element.dataset.deskDraft ?? '';
 }
 
-/** Предметы и листы держат наклон в CSS-переменной, декор — в свойстве `rotate`. */
+/**
+ * Предметы и листы держат наклон в CSS-переменной, декор — в свойстве `rotate`.
+ * Центр и ширина листа тоже в переменных (`--sheet-*`): левый верхний угол из них считает CSS.
+ */
 function readValues(element: HTMLElement, group: ItemGroup): ItemValues {
+  const rotate = parse(
+    group === 'decor' ? element.style.rotate : element.style.getPropertyValue('--rest-rotation-deg'),
+  );
+  if (group === 'draft') {
+    return {
+      x: parse(element.style.getPropertyValue('--sheet-x')),
+      y: parse(element.style.getPropertyValue('--sheet-y')),
+      width: parse(element.style.getPropertyValue('--sheet-w')),
+      rotate,
+    };
+  }
   return {
     x: parse(element.style.left),
     y: parse(element.style.top),
     width: parse(element.style.width),
-    rotate: parse(
-      group === 'decor'
-        ? element.style.rotate
-        : element.style.getPropertyValue('--rest-rotation-deg'),
-    ),
+    rotate,
   };
 }
 
 function writeValues(element: HTMLElement, group: ItemGroup, values: ItemValues): void {
-  element.style.left = percent(values.x);
-  element.style.top = percent(values.y);
-  element.style.width = percent(values.width);
+  if (group === 'draft') {
+    element.style.setProperty('--sheet-x', percent(values.x));
+    element.style.setProperty('--sheet-y', percent(values.y));
+    element.style.setProperty('--sheet-w', percent(values.width));
+  } else {
+    element.style.left = percent(values.x);
+    element.style.top = percent(values.y);
+    element.style.width = percent(values.width);
+  }
   if (group === 'decor') {
     element.style.rotate = deg(values.rotate);
   } else {
